@@ -9,7 +9,17 @@ services:
     routes:
       - name: profile
         paths:
-          - /test
+          - /api
+  - name: match
+    url: http://match:8080/api/v1/matchs
+    plugins:
+      - name: key-auth
+    tags:
+      - match
+    routes:
+      - name: match
+        paths:
+           - /api/v1/matchs
 
 consumers:
   - username: merveille

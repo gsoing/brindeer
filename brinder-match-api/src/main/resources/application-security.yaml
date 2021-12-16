@@ -1,0 +1,17 @@
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+keycloak:
+  enabled: true
+  realm: tindeer
+  auth-server-url: http://localhost:8080/auth
+  ssl-required: external
+  resource: tindeer
+  principal-attribute: preferred_username
+  cors: true
+logging:
+  level:
+    org:
+      springframework:
+        security: debug
+      keycloak: debug
