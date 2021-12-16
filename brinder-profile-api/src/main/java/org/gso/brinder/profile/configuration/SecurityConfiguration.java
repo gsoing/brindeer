@@ -40,7 +40,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
         http.cors();
         http
                 .authorizeRequests()
-                .antMatchers("/api/v1/profiles/**").hasRole("default-roles-tindeer")
+                .antMatchers("/api/v1/profiles/**").hasRole("tindeer-role")
                 .anyRequest().permitAll();
     }
 }
