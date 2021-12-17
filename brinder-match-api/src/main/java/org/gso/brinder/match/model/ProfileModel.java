@@ -15,36 +15,24 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 @Data
 @Builder
-@Document
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProfileModel {
 
     @Id
     private String id;
-    private String userId;
     @Email
     private String mail;
-    private int age;
-    private String firstName;
-    private String lastName;
-    @CreatedDate
-    private LocalDateTime created;
-    @LastModifiedDate
-    private LocalDateTime modified;
+    private String name;
 
+    private Address address;
+    /*
     public ProfileDto toDto() {
         return ProfileDto.builder()
                 .id(this.id)
-                .userId(this.userId)
-                .mail(this.mail)
-                .age(this.age)
-                .firstName(this.firstName)
-                .lastName(this.lastName)
-                .created(this.created)
-                .modified(this.modified)
+                .name(this.name)
+                .address(this.address)
                 .build();
-    }
+    }*/
 }

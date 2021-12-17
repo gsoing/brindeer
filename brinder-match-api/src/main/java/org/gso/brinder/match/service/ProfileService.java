@@ -1,43 +1,46 @@
 package org.gso.brinder.match.service;
 
-import lombok.RequiredArgsConstructor;
-import org.gso.brinder.common.exception.NotFoundException;
+
 import org.gso.brinder.match.model.ProfileModel;
-//import org.gso.brinder.match.repository.CustomProfileRepository;
 import org.gso.brinder.match.repository.ProfileRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-@RequiredArgsConstructor
 public class ProfileService {
 
+    private MongoOperations mongoOperations;
     private final ProfileRepository profileRepository;
-    //private final CustomProfileRepository customProfileRepository;
 
-	/*
-    public ProfileModel createProfile(ProfileModel userModel) {
-        return profileRepository.save(userModel);
+    public ProfileService(ProfileRepository profileRepository) {this.profileRepository = profileRepository;}
+
+    public ProfileModel saveProfile(ProfileModel profile) {
+        return profileRepository.save(profile);
     }
 
-    public ProfileModel getProfile(String profileId) {
-        return profileRepository.findById(profileId).orElseThrow(() -> NotFoundException.DEFAULT);
+    public List<ProfileModel> findAll() {
+        return profileRepository.findAll();
     }
 
-    public ProfileModel updateProfile(ProfileModel profileToUpdate) {
-        ProfileModel profileModel = this.getProfile(profileToUpdate.getId());
-        profileModel.setUserId(profileToUpdate.getUserId());
-        return profileRepository.save(profileModel);
+    public List<ProfileModel> findByDistance(float longitude, float latitude, int distance) {
+        Point basePoint = new Point(longitude,latitude);
+        Distance radius = new Distance(distance, Metrics.MILES);
+        Circle area = new Circle(basePoint, radius);
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("address.geoLocation").withinSphere(area));
+        return mongoOperations.find(query, ProfileModel.class);
     }
 
-    public Page<ProfileModel> searchProfiles(Criteria criteria, Pageable pageable) {
-        return customProfileRepository.searchProfiles(criteria, pageable);
+    public ProfileModel getProfileByEmail(String mail) {
+        return profileRepository.findByEmail(mail);
     }
-
-    public Page<ProfileModel> searchByMail(String mail, Pageable pageable) {
-        return profileRepository.findByMail(mail, pageable);
-    }*/
-
 }
