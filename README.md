@@ -23,7 +23,6 @@ Dans l'onglet de Rôles:
 	Manage -> Users
 	 - 	Creer un nouvel  User
 	 - Dans l'onglet Role Mapping de l'user toto que l'on vient de creer : l'assigner le role tindeer-role
+  <img src="../image/role.png" alt="Image d'assignation de role ">
+  <img src="../image/role2.png" alt="Image d'assignation de role ">
 
-Dans Manage -> Users
-- Add User
-- Configure -> Roles
