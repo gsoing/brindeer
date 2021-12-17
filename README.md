@@ -14,7 +14,15 @@ Aller sur Clients:
 - Save les modifications
 Dans Credentials onglet:
 - Regenerate le secret
-- Le conserver quelque part
+- Le conserver quelque part et l'appeler dans le docker_compose grâce à la 
+  variable d'environnement keycloak_credentials_secret
+
+Dans l'onglet de Rôles:
+	- Creer un nouveau role : tindeer-role
+	
+	Manage -> Users
+	 - 	Creer un nouvel  User
+	 - Dans l'onglet Role Mapping de l'user toto que l'on vient de creer : l'assigner le role tindeer-role
 
 Dans Manage -> Users
 - Add User
