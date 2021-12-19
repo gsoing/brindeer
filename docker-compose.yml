@@ -1,5 +1,23 @@
 version: "3"
 services:
+  kong:
+    image: kong:alpine
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DNS_RESOLVER: "127.0.0.11"
+      KONG_DECLARATIVE_CONFIG: "/usr/local/kong/declarative/kong.yml"
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_ADMIN_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+    volumes:
+      - ./kong:/usr/local/kong/declarative
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
   postgres:
     image: postgres
     environment:
@@ -35,13 +53,25 @@ services:
     ports:
       - "27017:27017"
   profile:
-    image: tindeer/brinder-profile-api
+    image: 'docker.io/tindeer/brinder-profile-api:latest'
     ports:
       - 9080:8080
     environment:
       spring_profiles_active: security,docker
+      keycloak_credentials_secret: 327c1a4c-10de-4508-b8ab-6d6fdaef489d
     depends_on:
       - mongo
+      - keycloak
+  match:
+    image: 'docker.io/tindeer/brinder-match-api:latest'
+    ports:
+      - 9081:8080
+    environment:
+      spring_profiles_active: security,docker
+      keycloak_credentials_secret: 327c1a4c-10de-4508-b8ab-6d6fdaef489d
+    depends_on:
+      - mongo
+      - keycloak
   swagger:
     image: swaggerapi/swagger-ui
     environment:

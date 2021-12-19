@@ -1,7 +1,11 @@
 spring:
   data:
     mongodb:
+      auto-index-creation: true
+      database: brinder
       host: mongo
+      port: 27017
 keycloak:
+  enabled: true
   auth-server-url: http://localhost:8080/auth
   proxy-url:  http://keycloak:8080/auth

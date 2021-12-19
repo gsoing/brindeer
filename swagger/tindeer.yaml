@@ -4,12 +4,155 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
-  - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+  - url: http://localhost:8000/api/v1/profiles
+    description: Profile API via KONG
+  - url: http://localhost:8000/api/v1/matchs
+    description: Match API via KONG
+security: 
+  - oAuthSample: 
+    - profile
+    - email
+    - userId
+  - ApiKeyAuth: []
+tags:
+  - name: Profile
+  - name: Match
+paths:
+  /current:
+    get:
+      tags:
+      - Profile
+      summary: Retourne le profile courant de l'utilisateur
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /myProfile:
+    parameters:
+      - in: query
+        name: "body"
+        description: "Profile attributes that need to be update"
+        schema:
+          $ref: '#/components/schemas/ProfileModel'
+    get:
+      tags:
+      - Profile
+      operationId: getCurrentProfil
+      summary: get current user profile informations
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileModel"
+    put:
+      tags:
+      - Profile
+      operationId: updateCurrentProfile
+      summary: update current user profile
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileModel"
+  /{id}:
+    parameters:
+      - name: "id"
+        in: path
+        description: "id of profile"
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: "body"
+        description: "Profile attributes that need to be update"
+        schema:
+          $ref: '#/components/schemas/ProfileModel'
+    get:
+      tags:
+        - Profile
+      operationId: getProfileById
+      summary: get a profile by Id for application admin
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileModel"
+    put:
+      tags:
+        - Profile
+      operationId: updateProfileById
+      summary: update a profile by Id for application admin
+      responses:
+        '200':
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileModel"
+  /updateLocation/{id}:
+    post:
+      tags:
+      - Match
+      summary: Update a user profile location
+      parameters:
+        - name: "id"
+          in: path
+          description: "id of profile that need to update location"
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: "body"
+          description: "Profile address to update"
+          required: true
+          schema:
+            $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                type: string
+  /findMatches/{id}:
+    get:
+      tags:
+      - Match
+      summary: get a matchs around a radius of 100 meters to profile location
+      parameters:
+          - name: "id"
+            in: path
+            description: "id of profile that need to get matchs"
+            required: true
+            schema:
+              type: string
+      responses:
+          '200':
+            description: return Profile that coud match around a radius of 100 meters to profile location
+            content:
+              application/json:
+                schema:
+                  type: "array"
+                  items:
+                    $ref: "#/components/schemas/ProfileModel"
 components:
   securitySchemes:
+    ApiKeyAuth:        # arbitrary name for the security scheme
+      type: apiKey
+      in: query       # can be "header", "query" or "cookie"
+      name: apikey
     oAuthSample:    # <---- arbitrary name
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
@@ -20,21 +163,56 @@ components:
           scopes:
             profile: access profile
             email: access email
-security: 
-  - oAuthSample: 
-    - profile
-    - email
-paths:
-  /profiles/current:
-    get:
-      summary: Retourne le profile courant de l'utilisateur
-      responses:
-        '200':    # status code
-          description: A JSON array of user names
-          content:
-            application/json:
-              schema: 
-                type: object
-                properties:
-                  name:
-                    type: string
+            userId: access to current profile id
+  schemas:
+    ProfileModel:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        mail:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: integer
+        address:
+          $ref: '#/components/schemas/Address'
+        created:
+          type: string
+          format: date
+        modified:
+          type: string
+          format: date
+      required:
+        - mail
+        - firstName
+        - lastName
+        - age
+        - address
+    Address:
+      type: object
+      properties:
+        streetNumber:
+          type: integer
+        streetName:
+          type: string
+        cityName:
+          type: string
+        zipCode:
+          type: integer
+        location:
+          $ref: '#/components/schemas/Location'
+    Location:
+      type: object
+      properties:
+        longitude:
+          type: number
+          format: double
+        latitude:
+          type: number
+          format: double
