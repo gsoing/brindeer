@@ -1,6 +1,6 @@
 # TP2 Architecture cloud pour mobile
 
-##Tindeer le final
+## Tindeer le final
 
 # Build 
 <b style="color:Orange">Warning:</b><b> prérequis Java version 11 </b>
@@ -15,7 +15,7 @@
   ```console
   3. $ ./gradlew publishToMavenLocal
   ```
-- ###brinder-profile-api
+- ### brinder-profile-api
   Se positionner dans le package <b>brinder-profile-api</b> puis exécuter les commandes suivantes: </br>
   ```console
   1. $ ./gradlew build
@@ -25,7 +25,7 @@
   ```
   ```console
   3. $ ./gradlew bootBuildImage
-- ###brinder-match-api
+- ### brinder-match-api
   Se positionner dans le package <b>brinder-match-api</b> puis exécuter les commandes suivantes: </br>
   ```console
   1. $ ./gradlew build
@@ -43,7 +43,7 @@ Lancer les services avec la commande suivante:
   ```
 
 # Demo
-###On a deux méthodes d'authentification: 
+### On a deux méthodes d'authentification: 
 
 - apiKey 
 ![image](./images/api-key.png)
