@@ -2,6 +2,7 @@ package org.gso.brinder.profile.endpoint;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import com.github.rutledgepaulv.qbuilders.builders.GeneralQueryBuilder;
 import com.github.rutledgepaulv.qbuilders.conditions.Condition;
@@ -13,9 +14,11 @@ import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
+import org.keycloak.KeycloakPrincipal;
 import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.IDToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +28,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Slf4j
@@ -51,16 +48,74 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
+	@RequestMapping(value ="/string", method = RequestMethod.GET,
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public String getProfileString() {
+        return "Profile";
+    }
+
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+        ProfileDto createdProfile = profileService.createProfile(profileDto.toModel()).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(createdProfile.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(createdProfile);
+    }
+
+    /* Ici on va déduire l'identifiant de l'utilisateur connecter pour récuperer les informations
+    * de son profil.
+    * */
+    @GetMapping("/myProfile")
+    public ResponseEntity<ProfileDto> getMyProfile() {
+
+        KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken)
+                SecurityContextHolder.getContext().getAuthentication();
+       Principal principal = (Principal) authentication.getPrincipal();
+
+        String profileId="";
+        if (principal instanceof KeycloakPrincipal) {
+            KeycloakPrincipal kPrincipal = (KeycloakPrincipal) principal;
+            IDToken token = kPrincipal.getKeycloakSecurityContext().getIdToken();
+
+            Map<String, Object> customClaims = token.getOtherClaims();
+
+            if (customClaims.containsKey("userId")) {
+                profileId = String.valueOf(customClaims.get("userId"));
+            }
+        }
+
+        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
+    }
+
+    /* Ici on va déduire l'identifiant de l'utilisateur connecter pour mettre à jour les informations
+     * de son profil.
+     * */
+    @PutMapping(path = "/myProfile", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateMyProfile(@RequestBody @NonNull ProfileDto profileDto) {
+
+        KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken)
+                SecurityContextHolder.getContext().getAuthentication();
+        Principal principal = (Principal) authentication.getPrincipal();
+
+        String profileId="";
+
+        if (principal instanceof KeycloakPrincipal) {
+            KeycloakPrincipal kPrincipal = (KeycloakPrincipal) principal;
+            IDToken token = kPrincipal.getKeycloakSecurityContext().getIdToken();
+
+            Map<String, Object> customClaims = token.getOtherClaims();
+
+            if (customClaims.containsKey("userId")) {
+                profileId = String.valueOf(customClaims.get("userId"));
+            }
+        }
+
+        profileDto.setId(profileId);
+        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
     }
 
     @GetMapping("/{id}")
@@ -69,7 +124,7 @@ public class ProfileController {
     }
 
     @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
+    public ResponseEntity<ProfileDto> updateProfile(@PathVariable("id") @NonNull String profileId,
                                                     @RequestBody @NonNull ProfileDto profileDto) {
         profileDto.setId(profileId);
         return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());

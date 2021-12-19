@@ -6,13 +6,9 @@ keycloak:
   realm: tindeer
   auth-server-url: http://localhost:8080/auth
   ssl-required: external
-  resource: tindeer-user
+  resource: tindeer
   principal-attribute: preferred_username
-  credentials: 
-    secret: f139a0a2-465b-4ab4-bfc4-73b70755d45e
   cors: true
-  bearer-only: true
-  use-resource-role-mappings: true
 logging:
   level:
     org:

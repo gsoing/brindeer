@@ -5,9 +5,6 @@ spring:
       database: brinder
       host: mongo
       port: 27017
-logging:
-  level:
-    org:
-      gso: debug
 keycloak:
-  enabled: false
+  auth-server-url: http://localhost:8080/auth
+  proxy-url:  http://keycloak:8080/auth
