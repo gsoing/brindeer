@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.annotation.security.RolesAllowed;
+
 @Slf4j
 @RestController
 @RequestMapping(
@@ -51,27 +53,38 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    @PostMapping
+    public ResponseEntity<ProfileDto> createProfile(Principal principal) {
+        AccessToken accessToken = getAccessToken(principal);
+
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setMail(accessToken.getEmail());
+        profileDto.setId(accessToken.getSubject());
+        profileDto.setFirstName(accessToken.getGivenName());
+        profileDto.setLastName(accessToken.getFamilyName());
+
+        profileService.createProfile(profileDto.toModel()).toDto();
+
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(profileDto.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(profileDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
+    @GetMapping("/myprofile")
+    public ResponseEntity<ProfileDto> getProfile(Principal principal) {
+        AccessToken accessToken = getAccessToken(principal);
+        String profileId = accessToken.getSubject();
         return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
     }
 
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
+    @PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateProfile(Principal principal,@RequestBody @NonNull ProfileDto profileDto) {
+        AccessToken accessToken = getAccessToken(principal);
+        profileDto.setId(accessToken.getSubject());
         return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
     }
 
@@ -99,10 +112,14 @@ public class ProfileController {
 
     @GetMapping("/current")
     public ResponseEntity getCurrentUserProfile(Principal principal) {
+        AccessToken accessToken = getAccessToken(principal);
+        return ResponseEntity.ok(accessToken);
+    }
+
+    public AccessToken getAccessToken(Principal principal) {
         KeycloakAuthenticationToken kp = (KeycloakAuthenticationToken) principal;
         SimpleKeycloakAccount simpleKeycloakAccount = (SimpleKeycloakAccount) kp.getDetails();
-        AccessToken accessToken = simpleKeycloakAccount.getKeycloakSecurityContext().getToken();
-        return ResponseEntity.ok(simpleKeycloakAccount.getKeycloakSecurityContext().getToken());
+        return simpleKeycloakAccount.getKeycloakSecurityContext().getToken();
     }
 
     /**

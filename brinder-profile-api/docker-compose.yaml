@@ -2,5 +2,6 @@ version: "3"
 services:
   mongo:
     image: mongo
+    command: mongod --port 27017
     ports:
       - "27017:27017"
