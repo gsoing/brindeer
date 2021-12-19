@@ -4,12 +4,62 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
-  - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+  - url: http://localhost:8000/
+    description: Application Finale
 components:
+  schemas:
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        mail:
+          type: string
+        age:
+          type: integer
+        firstname:
+          type: string
+        lastname:
+          type: string
+        created:
+          type: integer
+        updated:
+          type: integer
+    UserModel:
+      type: object
+      properties:
+        id:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+    UserModels:
+      type: array
+      items:
+        $ref: "#/components/schemas/UserModel"
+    ProfileDtos:
+      type: array
+      items:
+        $ref: "#/components/schemas/ProfileDto"
+    Coordonnee:
+      type: object
+      properties:
+        longitude:
+          type: number
+        latitude:
+          type: number
   securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: apikey
     oAuthSample:    # <---- arbitrary name
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
@@ -20,12 +70,57 @@ components:
           scopes:
             profile: access profile
             email: access email
-security: 
+security:
+  - ApiKeyAuth: []
   - oAuthSample: 
     - profile
     - email
 paths:
-  /profiles/current:
+  /profile:
+    get:
+      summary: Retourne la liste des profils
+      responses:
+        '200':
+          description: A JSON array of profiles
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileDtos"
+    post:
+      summary: Création du profil
+      responses:
+        '201':
+          description: A JSON profileDto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileDto"
+    put:
+      summary: profil mis à jour
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileDto"
+      responses:
+        '200':
+          description: A JSON profileDto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileDto"
+  /profile/myprofile:
+    get:
+      summary: Retourne le profil de l'utilisateur
+      responses:
+        '200':
+          description: A JSON profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileDto"
+  /profile/current:
     get:
       summary: Retourne le profile courant de l'utilisateur
       responses:
@@ -34,7 +129,52 @@ paths:
           content:
             application/json:
               schema: 
-                type: object
-                properties:
-                  name:
-                    type: string
+                $ref: "#/components/schemas/ProfileDto"
+  /match:
+    get:
+      summary: Retourne la liste des user dans un rayon de moins de 100 mètres
+      responses:
+        '200':
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModels"
+    post:
+      summary: Création du user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Coordonnee"
+      responses:
+        '201':
+          description: A JSON user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModel"
+    put:
+      summary: Mis à jour des coordonnées du user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Coordonnee"
+      responses:
+        '201':
+          description: A JSON user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModel"
+  /match/all:
+    get:
+      summary: Retourne la liste des user dans la table
+      responses:
+        '200':
+          description: A JSON array of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModels"

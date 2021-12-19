@@ -1,6 +1,7 @@
 spring:
   data:
     mongodb:
+      host: mongo
       auto-index-creation: true
       database: brinder
 logging:

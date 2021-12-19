@@ -11,7 +11,7 @@ public class ForbiddenException extends AbstractBrinderException {
 
     private ForbiddenException() {
         super(HttpStatus.FORBIDDEN,
-                ErrorMessage.builder().build().builder()
+                ErrorMessage.builder()
                         .code(FORBIDDEN_CODE)
                         .message(FORBIDDEN_MESSAGE)
                         .build());
