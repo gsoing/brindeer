@@ -1,4 +1,4 @@
-package org.gso.brinder.profile.configuration;
+package org.gso.brinder.match.configuration;
 
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
@@ -40,7 +40,7 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
         http.cors();
         http
                 .authorizeRequests()
-                .antMatchers("/api/v1/profiles/**").hasRole("tindeerrole")
+                .antMatchers("/api/v1/match/**").hasRole("tindeerrole")
                 .anyRequest().permitAll();
     }
 }

@@ -26,3 +26,33 @@ curl --location --request POST 'http://localhost:8080/auth/realms/tindeer/protoc
 --data-urlencode 'client_secret=a0f53195-8135-45af-b09c-954196a88ad0' \
 --data-urlencode 'token=XXXXXXXX'
 ```
+
+# TODO on first start-up
+# Migration of kong
+docker-compose up -d kong-db
+# check status it should be UP
+docker-compose ps 
+
+docker-compose run --rm kong kong migrations up
+
+# ADD A SERVICE
+$ curl -s -X POST http://localhost:8001/services \
+    -d name=profile \
+    -d url=http://host.docker.internal:9080 
+
+# ADD A ROUTE
+curl -s -X POST http://localhost:8001/routes \
+    -d service.id=${service_id} \
+    -d paths[]=/Profile
+
+# Configration keycloak avec kong
+
+curl -s -X POST http://localhost:8001/plugins \
+  -d name=oidc \
+  -d config.client_id=tindeer \
+  -d config.client_secret=32c0d787-abe3-4d70-b2aa-2d0f45206507 \
+  -d config.discovery=http://host.docker.internal:8080/auth/realms/master/.well-known/openid-configuration
+
+#ADD Keycloak redirect url: localhost:8000
+#ADD User and it's role "tindeerrole"
+
