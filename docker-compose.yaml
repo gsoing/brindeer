@@ -14,8 +14,9 @@ services:
     environment:
       KEYCLOAK_USER: keycloak
       KEYCLOAK_PASSWORD: keycloak
+      DB_SCHEMA: public
       KEYCLOAK_IMPORT: /tmp/tindeer-realm.json
-      DB_VENDOR: postgres
+      DB_VENDOR: POSTGRES
       DB_ADDR: postgres
       DB_USER: keycloak
       DB_PASSWORD: keycloak
