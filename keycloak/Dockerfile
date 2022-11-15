@@ -1,2 +1,2 @@
 FROM quay.io/keycloak/keycloak:legacy
-ADD tindeer-realm.json /tmp/tindeer-realm.jsonDemoApplication
+ADD tindeer-realm.json /tmp/tindeer-realm.json
