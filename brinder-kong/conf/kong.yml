@@ -1,0 +1,42 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: profile
+    url: http://172.19.0.1:9080/api/v1/profiles
+    routes:
+      - name: profile
+        paths: 
+          - /profile
+  - name: match
+    url: http://172.19.0.1:9081/api/v1/matchs
+    routes:
+      - name: match
+        paths: 
+          - /match
+consumers:
+- username: toto
+  keyauth_credentials:
+    - key: test
+
+plugins:
+- name: key-auth
+  config:
+    hide_credentials: true
+
+- name: key-auth
+  config:
+    key_names:
+    - apikey
+    key_in_body: false
+    key_in_header: true
+    key_in_query: true
+    hide_credentials: false
+    run_on_preflight: true
+
+
+
+
+
+
+

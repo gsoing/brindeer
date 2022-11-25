@@ -31,9 +31,11 @@ public class ProfileDto {
     private int age;
     private String firstName;
     private String lastName;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     private LocalDateTime created;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     private LocalDateTime modified;

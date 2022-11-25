@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+      database: brinder
+logging:
+  level:
+    org:
+      gso: debug
+keycloak:
+  enabled: false
+
+

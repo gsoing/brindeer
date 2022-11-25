@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
@@ -18,6 +20,8 @@ public class ProfileService {
     private final CustomProfileRepository customProfileRepository;
 
     public ProfileModel createProfile(ProfileModel userModel) {
+        LocalDateTime createdDate = LocalDateTime.now();
+        userModel.setCreated(createdDate);
         return profileRepository.save(userModel);
     }
 
@@ -28,6 +32,8 @@ public class ProfileService {
     public ProfileModel updateProfile(ProfileModel profileToUpdate) {
         ProfileModel profileModel = this.getProfile(profileToUpdate.getId());
         profileModel.setUserId(profileToUpdate.getUserId());
+        profileModel.setAge(profileToUpdate.getAge());
+        profileModel.setModified(profileToUpdate.getModified());
         return profileRepository.save(profileModel);
     }
 

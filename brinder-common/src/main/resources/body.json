@@ -1,0 +1,235 @@
+{
+  "authorities": [
+    {
+      "authority": "SCOPE_email"
+    },
+    {
+      "authority": "SCOPE_profile"
+    }
+  ],
+  "details": {
+    "remoteAddress": "172.19.0.1",
+    "sessionId": null
+  },
+  "authenticated": true,
+  "principal": {
+    "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJrLWhBSmh3QzB1Szg0YlJOVEZscnpXaU9sVmVhYnc0OHRPN3d6bDZiaFZFIn0.eyJleHAiOjE2NjkwNDQwMjAsImlhdCI6MTY2OTA0MzcyMCwiYXV0aF90aW1lIjoxNjY5MDQzNjU0LCJqdGkiOiJhMDlkMmQ1MC04ZWU0LTQxOTctOTNjNy04ODYwMGYxNjIwZjQiLCJpc3MiOiJodHRwOi8va2V5Y2xvYWs6ODA4MC9yZWFsbXMvdGluZGVlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjMjA0ODA2Ni0yMDc5LTQ0ZDktYjlkYS03MTA4YTUyYmNmNjAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzd2FnZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6IjY4YmFhODUyLTA1M2EtNDRhMC04MmM0LWM2YmNhNDMyNzc0YSIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4ODg4Il0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLXRpbmRlZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiNjhiYWE4NTItMDUzYS00NGEwLTgyYzQtYzZiY2E0MzI3NzRhIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoidG90byB0b3RvIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidG90byIsImdpdmVuX25hbWUiOiJ0b3RvIiwiZmFtaWx5X25hbWUiOiJ0b3RvIiwiZW1haWwiOiJ0b3RvQGdtYWlsLmNvbSJ9.ddXOvywoMukQwK4utMatVPQvjb4M6huamp-2ahh3HeGCnXvYzQdnpsRC2VCg3LiQRnLouLxUxt7-rphHqeGCTL2cLywDG79xvdTu6ffFq0RdUvthnM4VWqHzPPx0Xl5z-jFu9ZeJbAihj9auPRlTD9WgAWFzb1QmXKv_4qsY-7CwDFbU9dzQ4eQN0zAGi_fT-33ESDyTVb4Hj1jkV5_drhM-JvhM41q76Ls0XSPrZAGGccu6EEy9CF33yuFgMr8m8QgL-XLB1Q7rJCwf4q03j0SwPyBIxQsr59iyC-H-LaUiUzq5pXTJADqqN82rKgvHT4TKBHTyKv_Tjsnb4RD7hQ",
+    "issuedAt": "2022-11-21T15:15:20Z",
+    "expiresAt": "2022-11-21T15:20:20Z",
+    "headers": {
+      "kid": "k-hAJhwC0uK84bRNTFlrzWiOlVeabw48tO7wzl6bhVE",
+      "typ": "JWT",
+      "alg": "RS256"
+    },
+    "claims": {
+      "sub": "c2048066-2079-44d9-b9da-7108a52bcf60",
+      "resource_access": {
+        "account": {
+          "roles": [
+            "manage-account",
+            "manage-account-links",
+            "view-profile"
+          ]
+        }
+      },
+      "email_verified": false,
+      "allowed-origins": [
+        "http://localhost:8888"
+      ],
+      "iss": "http://keycloak:8080/realms/tindeer",
+      "typ": "Bearer",
+      "preferred_username": "toto",
+      "given_name": "toto",
+      "sid": "68baa852-053a-44a0-82c4-c6bca432774a",
+      "aud": [
+        "account"
+      ],
+      "acr": "0",
+      "realm_access": {
+        "roles": [
+          "default-roles-tindeer",
+          "offline_access",
+          "uma_authorization"
+        ]
+      },
+      "azp": "swagger",
+      "auth_time": 1669043654,
+      "scope": "email profile",
+      "name": "toto toto",
+      "exp": "2022-11-21T15:20:20Z",
+      "session_state": "68baa852-053a-44a0-82c4-c6bca432774a",
+      "iat": "2022-11-21T15:15:20Z",
+      "family_name": "toto",
+      "jti": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+      "email": "toto@gmail.com"
+    },
+    "id": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+    "issuer": "http://keycloak:8080/realms/tindeer",
+    "audience": [
+      "account"
+    ],
+    "subject": "c2048066-2079-44d9-b9da-7108a52bcf60",
+    "notBefore": null
+  },
+  "credentials": {
+    "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJrLWhBSmh3QzB1Szg0YlJOVEZscnpXaU9sVmVhYnc0OHRPN3d6bDZiaFZFIn0.eyJleHAiOjE2NjkwNDQwMjAsImlhdCI6MTY2OTA0MzcyMCwiYXV0aF90aW1lIjoxNjY5MDQzNjU0LCJqdGkiOiJhMDlkMmQ1MC04ZWU0LTQxOTctOTNjNy04ODYwMGYxNjIwZjQiLCJpc3MiOiJodHRwOi8va2V5Y2xvYWs6ODA4MC9yZWFsbXMvdGluZGVlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjMjA0ODA2Ni0yMDc5LTQ0ZDktYjlkYS03MTA4YTUyYmNmNjAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzd2FnZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6IjY4YmFhODUyLTA1M2EtNDRhMC04MmM0LWM2YmNhNDMyNzc0YSIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4ODg4Il0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLXRpbmRlZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiNjhiYWE4NTItMDUzYS00NGEwLTgyYzQtYzZiY2E0MzI3NzRhIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoidG90byB0b3RvIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidG90byIsImdpdmVuX25hbWUiOiJ0b3RvIiwiZmFtaWx5X25hbWUiOiJ0b3RvIiwiZW1haWwiOiJ0b3RvQGdtYWlsLmNvbSJ9.ddXOvywoMukQwK4utMatVPQvjb4M6huamp-2ahh3HeGCnXvYzQdnpsRC2VCg3LiQRnLouLxUxt7-rphHqeGCTL2cLywDG79xvdTu6ffFq0RdUvthnM4VWqHzPPx0Xl5z-jFu9ZeJbAihj9auPRlTD9WgAWFzb1QmXKv_4qsY-7CwDFbU9dzQ4eQN0zAGi_fT-33ESDyTVb4Hj1jkV5_drhM-JvhM41q76Ls0XSPrZAGGccu6EEy9CF33yuFgMr8m8QgL-XLB1Q7rJCwf4q03j0SwPyBIxQsr59iyC-H-LaUiUzq5pXTJADqqN82rKgvHT4TKBHTyKv_Tjsnb4RD7hQ",
+    "issuedAt": "2022-11-21T15:15:20Z",
+    "expiresAt": "2022-11-21T15:20:20Z",
+    "headers": {
+      "kid": "k-hAJhwC0uK84bRNTFlrzWiOlVeabw48tO7wzl6bhVE",
+      "typ": "JWT",
+      "alg": "RS256"
+    },
+    "claims": {
+      "sub": "c2048066-2079-44d9-b9da-7108a52bcf60",
+      "resource_access": {
+        "account": {
+          "roles": [
+            "manage-account",
+            "manage-account-links",
+            "view-profile"
+          ]
+        }
+      },
+      "email_verified": false,
+      "allowed-origins": [
+        "http://localhost:8888"
+      ],
+      "iss": "http://keycloak:8080/realms/tindeer",
+      "typ": "Bearer",
+      "preferred_username": "toto",
+      "given_name": "toto",
+      "sid": "68baa852-053a-44a0-82c4-c6bca432774a",
+      "aud": [
+        "account"
+      ],
+      "acr": "0",
+      "realm_access": {
+        "roles": [
+          "default-roles-tindeer",
+          "offline_access",
+          "uma_authorization"
+        ]
+      },
+      "azp": "swagger",
+      "auth_time": 1669043654,
+      "scope": "email profile",
+      "name": "toto toto",
+      "exp": "2022-11-21T15:20:20Z",
+      "session_state": "68baa852-053a-44a0-82c4-c6bca432774a",
+      "iat": "2022-11-21T15:15:20Z",
+      "family_name": "toto",
+      "jti": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+      "email": "toto@gmail.com"
+    },
+    "id": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+    "issuer": "http://keycloak:8080/realms/tindeer",
+    "audience": [
+      "account"
+    ],
+    "subject": "c2048066-2079-44d9-b9da-7108a52bcf60",
+    "notBefore": null
+  },
+  "token": {
+    "tokenValue": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJrLWhBSmh3QzB1Szg0YlJOVEZscnpXaU9sVmVhYnc0OHRPN3d6bDZiaFZFIn0.eyJleHAiOjE2NjkwNDQwMjAsImlhdCI6MTY2OTA0MzcyMCwiYXV0aF90aW1lIjoxNjY5MDQzNjU0LCJqdGkiOiJhMDlkMmQ1MC04ZWU0LTQxOTctOTNjNy04ODYwMGYxNjIwZjQiLCJpc3MiOiJodHRwOi8va2V5Y2xvYWs6ODA4MC9yZWFsbXMvdGluZGVlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjMjA0ODA2Ni0yMDc5LTQ0ZDktYjlkYS03MTA4YTUyYmNmNjAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzd2FnZ2VyIiwic2Vzc2lvbl9zdGF0ZSI6IjY4YmFhODUyLTA1M2EtNDRhMC04MmM0LWM2YmNhNDMyNzc0YSIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo4ODg4Il0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLXRpbmRlZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiNjhiYWE4NTItMDUzYS00NGEwLTgyYzQtYzZiY2E0MzI3NzRhIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJuYW1lIjoidG90byB0b3RvIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidG90byIsImdpdmVuX25hbWUiOiJ0b3RvIiwiZmFtaWx5X25hbWUiOiJ0b3RvIiwiZW1haWwiOiJ0b3RvQGdtYWlsLmNvbSJ9.ddXOvywoMukQwK4utMatVPQvjb4M6huamp-2ahh3HeGCnXvYzQdnpsRC2VCg3LiQRnLouLxUxt7-rphHqeGCTL2cLywDG79xvdTu6ffFq0RdUvthnM4VWqHzPPx0Xl5z-jFu9ZeJbAihj9auPRlTD9WgAWFzb1QmXKv_4qsY-7CwDFbU9dzQ4eQN0zAGi_fT-33ESDyTVb4Hj1jkV5_drhM-JvhM41q76Ls0XSPrZAGGccu6EEy9CF33yuFgMr8m8QgL-XLB1Q7rJCwf4q03j0SwPyBIxQsr59iyC-H-LaUiUzq5pXTJADqqN82rKgvHT4TKBHTyKv_Tjsnb4RD7hQ",
+    "issuedAt": "2022-11-21T15:15:20Z",
+    "expiresAt": "2022-11-21T15:20:20Z",
+    "headers": {
+      "kid": "k-hAJhwC0uK84bRNTFlrzWiOlVeabw48tO7wzl6bhVE",
+      "typ": "JWT",
+      "alg": "RS256"
+    },
+    "claims": {
+      "sub": "c2048066-2079-44d9-b9da-7108a52bcf60",
+      "resource_access": {
+        "account": {
+          "roles": [
+            "manage-account",
+            "manage-account-links",
+            "view-profile"
+          ]
+        }
+      },
+      "email_verified": false,
+      "allowed-origins": [
+        "http://localhost:8888"
+      ],
+      "iss": "http://keycloak:8080/realms/tindeer",
+      "typ": "Bearer",
+      "preferred_username": "toto",
+      "given_name": "toto",
+      "sid": "68baa852-053a-44a0-82c4-c6bca432774a",
+      "aud": [
+        "account"
+      ],
+      "acr": "0",
+      "realm_access": {
+        "roles": [
+          "default-roles-tindeer",
+          "offline_access",
+          "uma_authorization"
+        ]
+      },
+      "azp": "swagger",
+      "auth_time": 1669043654,
+      "scope": "email profile",
+      "name": "toto toto",
+      "exp": "2022-11-21T15:20:20Z",
+      "session_state": "68baa852-053a-44a0-82c4-c6bca432774a",
+      "iat": "2022-11-21T15:15:20Z",
+      "family_name": "toto",
+      "jti": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+      "email": "toto@gmail.com"
+    },
+    "id": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+    "issuer": "http://keycloak:8080/realms/tindeer",
+    "audience": [
+      "account"
+    ],
+    "subject": "c2048066-2079-44d9-b9da-7108a52bcf60",
+    "notBefore": null
+  },
+  "name": "c2048066-2079-44d9-b9da-7108a52bcf60",
+  "tokenAttributes": {
+    "sub": "c2048066-2079-44d9-b9da-7108a52bcf60",
+    "resource_access": {
+      "account": {
+        "roles": [
+          "manage-account",
+          "manage-account-links",
+          "view-profile"
+        ]
+      }
+    },
+    "email_verified": false,
+    "allowed-origins": [
+      "http://localhost:8888"
+    ],
+    "iss": "http://keycloak:8080/realms/tindeer",
+    "typ": "Bearer",
+    "preferred_username": "toto",
+    "given_name": "toto",
+    "sid": "68baa852-053a-44a0-82c4-c6bca432774a",
+    "aud": [
+      "account"
+    ],
+    "acr": "0",
+    "realm_access": {
+      "roles": [
+        "default-roles-tindeer",
+        "offline_access",
+        "uma_authorization"
+      ]
+    },
+    "azp": "swagger",
+    "auth_time": 1669043654,
+    "scope": "email profile",
+    "name": "toto toto",
+    "exp": "2022-11-21T15:20:20Z",
+    "session_state": "68baa852-053a-44a0-82c4-c6bca432774a",
+    "iat": "2022-11-21T15:15:20Z",
+    "family_name": "toto",
+    "jti": "a09d2d50-8ee4-4197-93c7-88600f1620f4",
+    "email": "toto@gmail.com"
+  }
+}

@@ -4,38 +4,384 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
-  - url: http://localhost:9080/api/v1
+  - url: http://localhost:8000/
     description: Environnement de test Docker
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
 components:
   securitySchemes:
     oAuthSample:    # <---- arbitrary name
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
       flows:
-        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
+        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)d
           authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
           tokenUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/token
           scopes:
             profile: access profile
             email: access email
-security: 
-  - oAuthSample: 
-    - profile
-    - email
+
+  schemas:
+
+    GeoLocation:
+      type: object
+      properties:
+        latitude:
+          type: number
+          example: 48.000022
+        longitude:
+          type: number
+          example: 48.000022
+
+    UserMatchProfile:
+      type: object
+      properties:
+        idMatchProfile:
+          type: string
+          example: "255-269"
+        firstName:
+          type: string
+          example: "Léa"
+        lastName:
+          type: string
+          example: "Martin"
+        geoLocation:
+          type: object
+          schema:
+            $ref: '#/components/schemas/Profile'
+
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          example: idProfile
+        userId:
+          type: string
+        mail:
+          type: string
+          example: mail@mail.com
+        age:
+          type: integer
+          example: 20
+        firstName:
+          type: string
+          example: Mathilde
+        lastName:
+          type: string
+          example: Martin
+        created:
+          type: string
+        modified:
+          type: string
+
+    ProfileModifiedDto:
+      type: object
+      properties:
+        age:
+          type: integer
+          example: 20
+          minimun: 13
+
+    PageDto:
+      type: object
+      properties:
+        pageSize:
+          type: integer
+          example: 5
+        totalElements:
+          type: number
+          example: 20
+        next:
+          type: string
+        first:
+          type: string
+        last:
+          type: string
+        data:
+          type: array
+          items :
+            $ref: '#/components/schemas/Profile'
+    Error404:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 25658-2568
+        message:
+          type: string
+          example: Aucun profile trouvé
+
+
+security:
+  - oAuthSample:
+      - profile
+      - email
+
 paths:
-  /profiles/current:
+  /profile/current:
     get:
       summary: Retourne le profile courant de l'utilisateur
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
       responses:
         '200':    # status code
           description: A JSON array of user names
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   name:
                     type: string
-                    
+  /profile/:
+    post:
+      summary: Créer un profile
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileModifiedDto'
+
+      responses:
+        '201':
+          description: Profile créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+  /profile/data:
+    get:
+      summary: Retourne le profile
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':    # status code
+          description: Retourne le profile trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          description: Veuillez vous connecter
+
+  /profile/modify:
+    put:
+      summary: Modifier un profile
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileModifiedDto'
+
+      responses:
+        '200':    # status code
+          description: Retourne le profile modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          description: Veuillez vous connecter
+
+  /profile/{mail}:
+    get:
+      summary: Retourne les profiles selon l'email
+      parameters:
+        - in: path
+          name: mail
+          required: true
+          schema:
+            type: string
+          description: mail du profile recherché
+        - in: query
+          name: size
+          required: false
+          description: Indiquer la taille de la page voulue
+          schema:
+            type: integer
+        - in: query
+          name: page
+          required: false
+          description: Numéro de la page souhaitée
+          schema:
+            type: integer
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':    # status code
+          description: Retourne liste de profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDto'
+        '401':
+          description: Veuillez vous connecter
+  /profile/search:
+    get:
+      summary: Retourne les profiles correspondant à la requête
+      parameters:
+        - in: query
+          name: query
+          required: false
+          description: Respecter le format RSQL
+          schema:
+            type: string
+        - in: query
+          name: page
+          required: false
+          description: Numéro de la page souhaitée
+          schema:
+            type: string
+        - in: query
+          name: size
+          required: false
+          description: Indiquer la taille de la page voulue
+          schema:
+            type: string
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Retourne liste de profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDto'
+        '401':
+          description: Veuillez vous connecter
+
+  /match/allLocations:
+    get:
+      summary: Return list of UserMatchProfile with location
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':    # status code
+          description: Return list of UserMatchProfile with location
+          content:
+            application/json:
+              schema:
+                type: array
+                items :
+                  $ref: '#/components/schemas/UserMatchProfile'
+        '401':
+          description: Veuillez vous connecter
+
+  /match/:
+    put:
+      summary: Update Profile
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoLocation'
+
+      responses:
+        '200':    # status code
+          description: Retourne le profile modifié
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMatchProfile'
+        '401':
+          description: Veuillez vous connecter
+
+
+    get:
+      summary: Create profile with location
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':    # status code
+          description: Return profile with location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMatchProfile'
+        '401':
+          description: Veuillez vous connecter
+    post:
+      summary: Create a UserMatchProfile
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoLocation'
+
+      responses:
+        '201':
+          description: UserMatchProfile créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMatchProfile'
+
+  /match/findLocationAround100Miles:
+    get:
+      summary: Find profile around 100 miles
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':    # status code
+          description: Return profile with location
+          content:
+            application/json:
+              schema:
+                type: array
+                items :
+                  $ref: '#/components/schemas/UserMatchProfile'
+        '401':
+          description: Veuillez vous connecter
+

@@ -1,4 +1,4 @@
-package org.gso.brinder.profile.configuration;
+package org.gso.brinder.match.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

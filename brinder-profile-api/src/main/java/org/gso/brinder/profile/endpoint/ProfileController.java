@@ -1,8 +1,5 @@
 package org.gso.brinder.profile.endpoint;
 
-import java.security.Principal;
-import java.util.List;
-
 import com.github.rutledgepaulv.qbuilders.builders.GeneralQueryBuilder;
 import com.github.rutledgepaulv.qbuilders.conditions.Condition;
 import com.github.rutledgepaulv.qbuilders.visitors.MongoVisitor;
@@ -10,7 +7,9 @@ import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.gso.brinder.common.dto.PageDto;
+import org.gso.brinder.profile.dto.PrincipalData;
 import org.gso.brinder.profile.dto.ProfileDto;
+import org.gso.brinder.profile.dto.ProfileModifiedDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
 import org.springframework.data.domain.Page;
@@ -24,16 +23,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.security.Principal;
+import java.util.List;
+
+
+@CrossOrigin("*")
 @Slf4j
 @RestController
 @RequestMapping(
@@ -49,34 +46,41 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    @PostMapping(value = "/", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileModifiedDto profileDto, Principal principal) {
+        PrincipalData principalData = getDataFromPrincipal(principal);
+
+        ProfileDto createdProfile = profileService.createProfile(profileDto.toModel(principalData.getUserId()
+                , principalData.getFirstName(), principalData.getLastName(), principalData.getMail())).toDto();
+
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(createdProfile.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(createdProfile);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
-        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
+    @GetMapping("/data")
+    public ResponseEntity<ProfileDto> getProfile(Principal principal) {
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) principal;
+        String userId = jwtAuth.getToken().getClaimAsString("sub");
+        return ResponseEntity.ok(profileService.getProfile(userId).toDto());
     }
 
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
+    @PutMapping(value="/modify",consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ProfileDto> updateProfile(@RequestBody @NonNull ProfileModifiedDto profileModifiedDto,
+                                                    Principal principal) {
+        PrincipalData principalData = getDataFromPrincipal(principal);
+
+        return ResponseEntity.ok(profileService.updateProfile(profileModifiedDto.toModel(principalData.getUserId(), principalData.getFirstName(), principalData.getLastName(), principalData.getMail())).toDto());
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
                                                              @PageableDefault(size = 20) Pageable pageable) {
-        Pageable checkedPageable  = checkPageSize(pageable);
+        Pageable checkedPageable = checkPageSize(pageable);
         Criteria criteria = convertQuery(query);
         Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
@@ -85,9 +89,9 @@ public class ProfileController {
                 .body(pageResults);
     }
 
-    @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
+    @GetMapping(value="/{mail}")
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@PathVariable("mail") String mail,
+                                                            @PageableDefault(size = 20) Pageable pageable) {
         Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
@@ -98,6 +102,15 @@ public class ProfileController {
     @GetMapping("/current")
     public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
         return ResponseEntity.ok(principal);
+    }
+
+    public PrincipalData getDataFromPrincipal(Principal principal) {
+        JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) principal;
+        String userId = jwtAuth.getToken().getClaimAsString("sub");
+        String mail = jwtAuth.getToken().getClaimAsString("email");
+        String firstName = jwtAuth.getToken().getClaimAsString("given_name");
+        String lastName = jwtAuth.getToken().getClaimAsString("family_name");
+        return new PrincipalData(userId, mail, firstName, lastName);
     }
 
     /**
