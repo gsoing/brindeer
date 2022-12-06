@@ -18,6 +18,7 @@ import org.gso.brinder.profile.service.ProfileService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -93,7 +94,7 @@ public class ProfileController {
 
     @GetMapping
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
+                                                                            @PageableDefault(size = 20) Pageable pageable) {
         Pageable checkedPageable  = checkPageSize(pageable);
         Criteria criteria = convertQuery(query);
         Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
