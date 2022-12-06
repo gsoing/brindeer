@@ -29,9 +29,9 @@ repositories {
 
 bootBuildImage {
 	imageName = "tindeer/${project.name}"
-	docker {
+	/*docker {
 		bindHostToBuilder = true
-	}
+	}*/
 }
 
 jib {

@@ -1,6 +1,8 @@
 package org.gso.brinder.profile.endpoint;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.github.rutledgepaulv.qbuilders.builders.GeneralQueryBuilder;
@@ -49,16 +51,32 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    @PostMapping("/sign_in")
+    public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal) {
+
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setId(principal.getToken().getId());
+        profileDto.setUserId(principal.getTokenAttributes().get("sub").toString());
+        profileDto.setFirstName(principal.getTokenAttributes().get("given_name").toString());
+        profileDto.setLastName(principal.getTokenAttributes().get("family_name").toString());
+        profileDto.setMail(principal.getTokenAttributes().get("email").toString());
+         /*
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss");
+        LocalDateTime created = LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter);
+        profileDto.setCreated(created);
+        profileDto.setModified(created);
+        */ // TRIED MANY SOLUTIONS BUT DIDN'T WORK
+
+        profileDto.setAge(Integer.parseInt(principal.getTokenAttributes().get("age").toString()));
+
+        ProfileDto createdProfile = profileService.createProfile(profileDto.toModel()).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(createdProfile.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(createdProfile);
     }
 
     @GetMapping("/{id}")

@@ -38,4 +38,16 @@ paths:
                 properties:
                   name:
                     type: string
-                    
+  /profiles/sign_in:
+    post:
+      summary: Création de profil de l'utilisateur
+      responses:
+        '200': # status code
+          description: Le profil crée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
