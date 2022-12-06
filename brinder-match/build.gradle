@@ -36,6 +36,8 @@ dependencies {
     implementation 		'org.springframework.boot:spring-boot-starter-validation'
     implementation 		'org.springframework.boot:spring-boot-starter-web'
     implementation 		'org.springframework.boot:spring-boot-starter-security'
+    implementation		'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 		'org.springframework.security:spring-security-oauth2-jose'
     implementation		'org.gso.brinder:brinder-common:1.0.0-SNAPSHOT'
     implementation 		'com.github.rutledgepaulv:q-builders:1.5'
     implementation 		'com.github.rutledgepaulv:rest-query-engine:0.7.1'
