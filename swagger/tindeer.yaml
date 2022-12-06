@@ -4,12 +4,14 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
-  - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+  - url: http://localhost:8000/
+    description: Brindeer App
 components:
   securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: apikey
     oAuthSample:    # <---- arbitrary name
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
@@ -20,12 +22,13 @@ components:
           scopes:
             profile: access profile
             email: access email
-security: 
+security:
+  - ApiKeyAuth: []
   - oAuthSample: 
     - profile
     - email
 paths:
-  /profiles/current:
+  /profile/current:
     get:
       summary: Retourne le profile courant de l'utilisateur
       responses:
@@ -38,7 +41,7 @@ paths:
                 properties:
                   name:
                     type: string
-  /profiles/sign_in:
+  /profile/sign_in:
     post:
       summary: Création de profil de l'utilisateur
       responses:
