@@ -1,0 +1,17 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: profile
+    url: http://profile:8080/api/v1/profiles
+    plugins:
+      - name: key-auth
+    routes:
+      - name: profile
+        paths:
+          - /profile
+
+consumers:
+  - username: sarra
+    keyauth_credentials:
+      - key: sarra
