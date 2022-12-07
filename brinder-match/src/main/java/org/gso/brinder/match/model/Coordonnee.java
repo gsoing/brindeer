@@ -1,35 +1,29 @@
 package org.gso.brinder.match.model;
 
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
+
 public class Coordonnee {
-    private double longitude;
-    private double latitude;
+    @GeoSpatialIndexed
+    private int[] location;
 
-    public double getLongitude() {
-        return longitude;
+    public Coordonnee(int longitude, int latitude){
+        location[0] = longitude;
+        location[1] = latitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+    public int[] getLocation() {
+        return location;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Coordonnee(double longitude, double latitude){
-        this.longitude = longitude;
-        this.latitude = latitude;
+    public void setLocation(int[] location) {
+        this.location = location;
     }
 
     @Override
     public String toString() {
         String str="";
-        str = str + "longitude: " + this.longitude + ' ';
-        str = str + "latitude: " + this.latitude  ;
+        str = str + "longitude: " + location[0] + ' ';
+        str = str + "latitude: " + location[1];
         return  str;
     }
 }
