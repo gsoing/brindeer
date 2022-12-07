@@ -2,6 +2,7 @@ package org.gso.brinder.match.service;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.C;
 import org.gso.brinder.match.model.Coordonnee;
 import org.gso.brinder.match.model.User;
 import org.gso.brinder.match.repository.UserRepository;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResult;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +46,7 @@ public class UserService {
     }
 
     @GetMapping("/address")
-    private void addressToCoordinate(JwtAuthenticationToken token) {
+    public Coordonnee addressToCoordinate(JwtAuthenticationToken token) {
 //        String address = (String) token.getTokenAttributes().get("address");
         String address = "31 Rue Camille Mouquet Charenton-Le-Pont France";
         String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&address="
@@ -55,8 +57,9 @@ public class UserService {
         JSONObject result = restTemplate.getForObject(url, JSONObject.class);
 //        double latitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lat");
 //        double longitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lng")
-        double latitude = result.get("lat"); double longitude = result.get("lng");
+        double latitude = (double) result.get("lat"); double longitude = (double) result.get("lng");
         logger.info("latitude = " + latitude + ", longitude = " + longitude);
+        return new Coordonnee(longitude,latitude);
     }
 
     // RECUPERER LES USERS 100M AUX ALENTOURS

@@ -23,6 +23,6 @@ public class User {
     @Email
     private String mail;
     private int age;
-    private Double longitude;
-    private Double latitude;
+    private double longitude;
+    private double latitude;
 }

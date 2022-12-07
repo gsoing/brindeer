@@ -4,18 +4,18 @@ import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 
 public class Coordonnee {
     @GeoSpatialIndexed
-    private int[] location;
+    private double[] location;
 
-    public Coordonnee(int longitude, int latitude){
+    public Coordonnee(double longitude, double latitude){
         location[0] = longitude;
         location[1] = latitude;
     }
 
-    public int[] getLocation() {
+    public double[] getLocation() {
         return location;
     }
 
-    public void setLocation(int[] location) {
+    public void setLocation(double[] location) {
         this.location = location;
     }
 

@@ -2,9 +2,14 @@ package org.gso.brinder.match.endpoint;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.gso.brinder.match.model.Coordonnee;
+import org.gso.brinder.match.model.User;
 import org.gso.brinder.match.service.UserService;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -20,5 +25,12 @@ public class UserController {
 
     private final UserService userService;
 
+    public void updateUserLocation(JwtAuthenticationToken token) { userService.updateUserLocation(token); }
 
-}
+//    public List<User> searchSurroundingUsers(JwtAuthenticationToken token) {userService.searchSurroundingUsers(token)}
+
+    public List<User> getAllUsers() { return userService.getAllUsers(); }
+
+    @GetMapping("/address")
+    private Coordonnee addressToCoordinate(JwtAuthenticationToken token) { return userService.addressToCoordinate(token); }
+    }
