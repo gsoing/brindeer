@@ -25,26 +25,14 @@ public class ProfileDto {
     private String id;
     @NotEmpty
     private String userId;
-    @Email
-    private String mail;
     @Min(13)
     private int age;
-    private String firstName;
-    private String lastName;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
-    private LocalDateTime created;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
-    private LocalDateTime modified;
 
     public ProfileModel toModel() {
         return ProfileModel.builder()
                 .id(this.id)
                 .userId(this.userId)
                 .age(this.age)
-                .firstName(this.firstName)
-                .lastName(this.lastName)
                 .build();
     }
 }
