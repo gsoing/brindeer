@@ -13,9 +13,6 @@ import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -98,11 +96,8 @@ public class ProfileController {
     }
 
     @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(Principal principal) {
-        KeycloakAuthenticationToken kp = (KeycloakAuthenticationToken) principal;
-        SimpleKeycloakAccount simpleKeycloakAccount = (SimpleKeycloakAccount) kp.getDetails();
-        AccessToken accessToken = simpleKeycloakAccount.getKeycloakSecurityContext().getToken();
-        return ResponseEntity.ok(simpleKeycloakAccount.getKeycloakSecurityContext().getToken());
+    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
+        return ResponseEntity.ok(principal);
     }
 
     /**
@@ -155,5 +150,4 @@ public class ProfileController {
                         .build().toUri());
         return pageResults;
     }
-
 }

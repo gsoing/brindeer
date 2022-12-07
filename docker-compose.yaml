@@ -1,36 +1,12 @@
 version: "3"
 services:
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: keycloak
-      POSTGRES_USER: keycloak
-      POSTGRES_DB: keycloak
-      PGADMIN_CONFIG_SERVER_MODE: "False"
   keycloak:
     build: ./keycloak
-    depends_on:
-      - postgres
     environment:
-      KEYCLOAK_USER: keycloak
-      KEYCLOAK_PASSWORD: keycloak
-      DB_SCHEMA: public
-      KEYCLOAK_IMPORT: /tmp/tindeer-realm.json
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_USER: keycloak
-      DB_PASSWORD: keycloak
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak
     ports:
       - 8080:8080
-  pgadmin:
-    build: ./pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: keycloak@tindeer.com
-      PGADMIN_DEFAULT_PASSWORD: keycloak
-    ports:
-      - 5050:80
-    depends_on:
-      - postgres  
   mongo:
     image: mongo
     ports:
