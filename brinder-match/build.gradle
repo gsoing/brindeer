@@ -49,6 +49,7 @@ dependencies {
     developmentOnly 	'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 	'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.apereo.cas:cas-server-support-geolocation-googlemaps:${cas.version}'
 }
 
 test {

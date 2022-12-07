@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Email;
+
 
 @Data
 @Builder
@@ -18,6 +20,9 @@ public class User {
     private String id;
     private String firstname;
     private String lastname;
+    @Email
+    private String mail;
+    private int age;
     private Double longitude;
     private Double latitude;
 }

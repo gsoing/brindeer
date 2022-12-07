@@ -2,19 +2,22 @@ version: "3"
 services:
   keycloak:
     build: ./keycloak
-#    environment:
-#      KEYCLOAK_ADMIN: keycloak
-#      KEYCLOAK_ADMIN_PASSWORD: keycloak
+    environment:
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak
+#      KEYCLOAK_USER: test
+#      KEYCLOAK_PASSWORD: test
+#      KEYCLOAK_IMPORT: /tmp/tindeer-realm.json
     ports:
       - 8080:8080
   mongo:
     image: mongo
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ncc
-      MONGO_INITDB_ROOT_PASSWORD: nccfisa
-      MONGO_INITDB_DATABASE: brindeer-users
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: ncc
+#      MONGO_INITDB_ROOT_PASSWORD: nccfisa
+#      MONGO_INITDB_DATABASE: brindeer-users
   profile:
     image: tindeer/brinder-profile-api
     ports:
