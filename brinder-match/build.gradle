@@ -43,13 +43,12 @@ dependencies {
     implementation 		'com.github.rutledgepaulv:rest-query-engine:0.7.1'
     implementation		'org.keycloak:keycloak-spring-boot-starter'
     implementation      'org.projectlombok:lombok:1.18.18'
-    implementation      'org.projectlombok:lombok:1.18.18'
     implementation      'io.spring.platform:platform-bom:1.0.0.RELEASE'
     compileOnly 		'org.projectlombok:lombok'
     developmentOnly 	'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 	'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.apereo.cas:cas-server-support-geolocation-googlemaps:${cas.version}'
+    implementation 'org.apereo.cas:cas-server-support-geolocation-googlemaps:6.6.3'
 }
 
 test {
