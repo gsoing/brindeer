@@ -15,9 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.data.geo.Point;
 import org.springframework.web.client.RestTemplate;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -67,7 +69,7 @@ public class UserService {
     // RECUPERER LES USERS 100M AUX ALENTOURS
     public List<User> searchSurroundingUsers(JwtAuthenticationToken token) {
         Coordonnee coordonnee = addressToCoordinate(token);
-        List<GeoResult<User>> results = userRepository.findByLocationNear(coordonnee, new Distance(100)).getContent();
+        List<GeoResult<User>> results = userRepository.findByLocationNear(new Point(coordonnee.getLocation()[0],coordonnee.getLocation()[1]), new Distance(100)).getContent();
         List<User> returned_result = null;
         for (GeoResult<User> result : results) {
             if (result.getContent().getId() != token.getTokenAttributes().get("sub"))
