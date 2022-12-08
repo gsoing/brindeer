@@ -25,10 +25,13 @@ public class UserController {
 
     private final UserService userService;
 
+    @PostMapping("/users/update")
     public void updateUserLocation(JwtAuthenticationToken token) { userService.updateUserLocation(token); }
 
-//    public List<User> searchSurroundingUsers(JwtAuthenticationToken token) {userService.searchSurroundingUsers(token)}
+    @GetMapping("/users/nearest")
+    public List<User> searchSurroundingUsers(JwtAuthenticationToken token) { return userService.searchSurroundingUsers(token); }
 
+    @GetMapping("/users")
     public List<User> getAllUsers() { return userService.getAllUsers(); }
 
     @GetMapping("/address/{address}")
