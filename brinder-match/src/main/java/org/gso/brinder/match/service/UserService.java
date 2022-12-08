@@ -61,17 +61,7 @@ public class UserService {
 
     public Coordonnee addressToCoordinate(JwtAuthenticationToken token) {
         String address = (String) token.getTokenAttributes().get("address");
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&address="
-                + java.net.URLEncoder.encode(address, StandardCharsets.UTF_8).replace("+", "%20");
-        logger.info(url);
-
-        RestTemplate restTemplate = new RestTemplate();
-        JSONObject result = restTemplate.getForObject(url, JSONObject.class);
-//        double latitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lat");
-//        double longitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lng")
-        double latitude = (double) result.get("lat"); double longitude = (double) result.get("lng");
-        logger.info("latitude = " + latitude + ", longitude = " + longitude);
-        return new Coordonnee(longitude,latitude);
+        return addressToCoordinate(address);
     }
 
     // RECUPERER LES USERS 100M AUX ALENTOURS
