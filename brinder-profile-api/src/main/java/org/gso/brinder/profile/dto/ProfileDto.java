@@ -32,10 +32,8 @@ public class ProfileDto {
     private String firstName;
     private String lastName;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     private LocalDateTime created;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     private LocalDateTime modified;
 
     public ProfileModel toModel() {
@@ -43,6 +41,7 @@ public class ProfileDto {
                 .id(this.id)
                 .userId(this.userId)
                 .age(this.age)
+                .mail(this.mail)
                 .firstName(this.firstName)
                 .lastName(this.lastName)
                 .build();

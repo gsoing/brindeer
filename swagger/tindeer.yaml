@@ -7,6 +7,26 @@ servers:
   - url: http://localhost:8000/
     description: Brindeer App
 components:
+  schemas:
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        mail:
+          type: string
+        age:
+          type: integer
+        firstname:
+          type: string
+        lastname:
+          type: string
+        created:
+          type: integer
+        updated:
+          type: integer
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
@@ -28,6 +48,24 @@ security:
     - profile
     - email
 paths:
+  /profile/search:
+    get:
+      summary: Retourne la liste des profils
+      parameters:
+        - in: query
+          name: mail
+          schema:
+            type: string
+          allowReserved: true
+          description: Recherche le profil par mail
+      responses:
+        '200':
+          description: A JSON array of profiles
+          content:
+            application/json:
+              schema:
+                type: object
+
   /profile/current:
     get:
       summary: Retourne le profile courant de l'utilisateur
@@ -47,6 +85,37 @@ paths:
       responses:
         '200': # status code
           description: Le profil crée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /profile/myprofile:
+    get:
+      summary: Retourne le profil l'utilisateur
+      responses:
+        '200': # status code
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /profile/update:
+    put:
+      summary: Mettre à jour le profil de l'utilisateur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileDto"
+      responses:
+        '200': # status code
+          description: A JSON array of user names
           content:
             application/json:
               schema:
