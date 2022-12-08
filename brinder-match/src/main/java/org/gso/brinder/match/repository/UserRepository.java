@@ -1,5 +1,6 @@
 package org.gso.brinder.match.repository;
 
+import org.gso.brinder.match.model.Coordonnee;
 import org.gso.brinder.match.model.User;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
@@ -10,5 +11,5 @@ import java.awt.*;
 
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
-    GeoResults<User> findByLocationNear(Point location, Distance distance);
+    GeoResults<User> findByLocationNear(Coordonnee location, Distance distance);
 }

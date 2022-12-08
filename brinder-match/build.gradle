@@ -37,6 +37,7 @@ dependencies {
     implementation 		'org.springframework.boot:spring-boot-starter-web'
     implementation 		'org.springframework.boot:spring-boot-starter-security'
     implementation		'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation      'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 		'org.springframework.security:spring-security-oauth2-jose'
     implementation		'org.gso.brinder:brinder-common:1.0.0-SNAPSHOT'
     implementation 		'com.github.rutledgepaulv:q-builders:1.5'
@@ -49,6 +50,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 	'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.apereo.cas:cas-server-support-geolocation-googlemaps:6.6.3'
+
 }
 
 test {

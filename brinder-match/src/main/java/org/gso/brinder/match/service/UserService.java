@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@RequestMapping("")
+
 public class UserService {
 
     private final UserRepository userRepository;
@@ -35,17 +35,30 @@ public class UserService {
 
     // METTRE A JOUR LES COORDONNEES
     public void updateUserLocation(JwtAuthenticationToken token) {
-        double[] coordinate = addressToCoordinate(token);
+        Coordonnee coordinate = addressToCoordinate(token);
         userRepository.save(new User(token.getTokenAttributes().get("sub").toString(),
                 token.getTokenAttributes().get("given_name").toString(),
                 token.getTokenAttributes().get("family_name").toString(),
                 token.getTokenAttributes().get("email").toString(),
                 (Integer) token.getTokenAttributes().get("age"),
-                coordinate[0],
-                coordinate[1]));
+                coordinate.getLocation()[0],
+                coordinate.getLocation()[1]));
     }
 
-    @GetMapping("/address")
+    public Coordonnee addressToCoordinate(String address) {
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&address="
+                + java.net.URLEncoder.encode(address, StandardCharsets.UTF_8).replace("+", "%20");
+        logger.info(url);
+
+        RestTemplate restTemplate = new RestTemplate();
+        JSONObject result = restTemplate.getForObject(url, JSONObject.class);
+//        double latitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lat");
+//        double longitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lng")
+        double latitude = (double) result.get("lat"); double longitude = (double) result.get("lng");
+        logger.info("latitude = " + latitude + ", longitude = " + longitude);
+        return new Coordonnee(longitude,latitude);
+    }
+
     public Coordonnee addressToCoordinate(JwtAuthenticationToken token) {
         String address = (String) token.getTokenAttributes().get("address");
         String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&address="
@@ -63,9 +76,8 @@ public class UserService {
 
     // RECUPERER LES USERS 100M AUX ALENTOURS
     public List<User> searchSurroundingUsers(JwtAuthenticationToken token) {
-        List<GeoResult<User>> results = userRepository.findByLocationNear(
-                new Point(coordonnee.getLocation()[0],coordonnee.getLocation()[1]), new Distance(100)
-        ).getContent();
+        Coordonnee coordonnee = addressToCoordinate(token);
+        List<GeoResult<User>> results = userRepository.findByLocationNear(coordonnee, new Distance(100)).getContent();
         List<User> returned_result = null;
         for (GeoResult<User> result : results) {
             if (result.getContent().getId() != token.getTokenAttributes().get("sub"))
