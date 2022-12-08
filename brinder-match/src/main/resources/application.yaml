@@ -15,6 +15,6 @@ keycloak:
   auth-server-url: http://localhost:8080/auth
   proxy-url:  http://keycloak:8080/auth
   resource: tindeer
-
+  
 server:
   port: 9090
