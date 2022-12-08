@@ -36,4 +36,7 @@ public class UserController {
 
     @GetMapping("/address/{address}")
     private Coordonnee addressToCoordinate(@PathVariable("address") String address) { return userService.addressToCoordinate(address); }
+
+    @GetMapping("/address")
+    private Coordonnee addressToCoordinate(JwtAuthenticationToken token) { return userService.addressToCoordinate(token); }
     }
