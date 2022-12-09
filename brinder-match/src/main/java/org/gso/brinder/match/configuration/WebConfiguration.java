@@ -12,16 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
-                .ignoring()
-                .antMatchers(HttpMethod.GET,"/**")
-                .antMatchers(HttpMethod.POST,"/**");
-
-
-        //completely bypass the Spring Security Filter Chain.
-    }
-    @Override
     public void addCorsMappings(CorsRegistry registry) {
         CorsRegistration corsRegistration = registry.addMapping("/**");
         corsRegistration.allowedMethods(

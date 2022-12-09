@@ -12,10 +12,7 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.Point;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-<<<<<<< HEAD
-import org.springframework.data.geo.Point;
-=======
->>>>>>> be080452e5864a09513f951f75779a94c331d245
+
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;

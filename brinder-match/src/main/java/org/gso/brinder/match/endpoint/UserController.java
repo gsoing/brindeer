@@ -41,13 +41,12 @@ public class UserController {
     @GetMapping("/address/{address}")
     private Coordonnee addressToCoordinate(@PathVariable("address") String address) { return userService.addressToCoordinate(address); }
 
-<<<<<<< HEAD
+
     @GetMapping("/current")
     public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
         return ResponseEntity.ok(principal);
-=======
+    }
     @GetMapping("/address")
     private Coordonnee addressToCoordinate(JwtAuthenticationToken token) { return userService.addressToCoordinate(token); }
->>>>>>> be080452e5864a09513f951f75779a94c331d245
-    }
+
 }
