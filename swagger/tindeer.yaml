@@ -123,3 +123,51 @@ paths:
                 properties:
                   name:
                     type: string
+  /matchs/address:
+    get:
+      summary: Retourne l'adresse de l'utilisateur
+      responses:
+        '200':
+          description: The address
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/update:
+    put:
+      summary: Mettre à jour l'adresse de l'utilisateur
+#      requestBody:
+#        content:
+#          application/json:
+#            schema:
+#              $ref: "#/components/schemas/ProfileDto"
+      parameters:
+        - in: query
+          name: address
+          schema:
+            type: string
+          allowReserved: true
+          description: Nouvelle adresse
+      responses:
+        '200':
+          description: The address
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /users/nearest:
+    get:
+      summary: Retourne les utilisateurs les plus proche
+      #      requestBody:
+      #        content:
+      #          application/json:
+      #            schema:
+      #              $ref: "#/components/schemas/ProfileDto"
+      responses:
+        '200':
+          description: JSON Array of users
+          content:
+            application/json:
+              schema:
+                type: object
