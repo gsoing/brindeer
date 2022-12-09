@@ -29,8 +29,8 @@ public class UserController {
     @PostMapping("/users/update")
     public ResponseEntity<User> updateUserLocation(JwtAuthenticationToken token) { return ResponseEntity.ok(userService.updateUserLocation(token)); }
 
-    @PostMapping("/users/update")
-    public void updateUserLocation(JwtAuthenticationToken token, @RequestParam String new_address) { userService.updateUserLocation(token, new_address); }
+   // @PostMapping("/users/update")
+    //public void updateUserLocation(JwtAuthenticationToken token, @RequestParam String new_address) { userService.updateUserLocation(token, new_address); }
 
     @GetMapping("/users/nearest")
     public List<User> searchSurroundingUsers(JwtAuthenticationToken token) { return userService.searchSurroundingUsers(token); }

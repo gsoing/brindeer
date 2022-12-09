@@ -33,24 +33,24 @@ public class UserService {
     // METTRE A JOUR LES COORDONNEES
     public User updateUserLocation(JwtAuthenticationToken token) {
         Coordonnee coordinate = addressToCoordinate(token);
+        Point point = new Point(coordinate.getLocation()[0],coordinate.getLocation()[1]);
        return userRepository.save(new User(token.getTokenAttributes().get("sub").toString(),
                 token.getTokenAttributes().get("given_name").toString(),
                 token.getTokenAttributes().get("family_name").toString(),
                 token.getTokenAttributes().get("email").toString(),
                 (Integer) token.getTokenAttributes().get("age"),
-                coordinate.getLocation()[0],
-                coordinate.getLocation()[1]));
+                point));
     }
 
     public void updateUserLocation(JwtAuthenticationToken token, String address) {
         Coordonnee coordinate = addressToCoordinate(address);
+        Point point = new Point(coordinate.getLocation()[0],coordinate.getLocation()[1]);
         userRepository.save(new User(token.getTokenAttributes().get("sub").toString(),
                 token.getTokenAttributes().get("given_name").toString(),
                 token.getTokenAttributes().get("family_name").toString(),
                 token.getTokenAttributes().get("email").toString(),
                 (Integer) token.getTokenAttributes().get("age"),
-                coordinate.getLocation()[0],
-                coordinate.getLocation()[1]));
+                point));
     }
 
     public Coordonnee addressToCoordinate(String address) {

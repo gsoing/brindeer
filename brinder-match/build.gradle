@@ -37,27 +37,26 @@ jib {
         image = "tindeer/${project.name}"
     }
 }
-
+jib {
+    to {
+        image = "tindeer/${project.name}"
+    }
+}
 dependencies {
-    implementation platform('org.keycloak.bom:keycloak-adapter-bom:15.0.2')
     implementation 		'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 		'org.springframework.boot:spring-boot-starter-validation'
     implementation 		'org.springframework.boot:spring-boot-starter-web'
     implementation 		'org.springframework.boot:spring-boot-starter-security'
     implementation		'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    implementation      'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 		'org.springframework.security:spring-security-oauth2-jose'
     implementation		'org.gso.brinder:brinder-common:1.0.0-SNAPSHOT'
-    implementation 		'com.github.rutledgepaulv:q-builders:1.5'
+    implementation 		'com.github.rutledgepaulv:q-builders:1.6'
     implementation 		'com.github.rutledgepaulv:rest-query-engine:0.7.1'
-    implementation		'org.keycloak:keycloak-spring-boot-starter'
-    implementation      'org.projectlombok:lombok:1.18.18'
-    implementation      'io.spring.platform:platform-bom:1.0.0.RELEASE'
+    //implementation 'org.apereo.cas:cas-server-support-geolocation-googlemaps:6.6.3'
     compileOnly 		'org.projectlombok:lombok'
     developmentOnly 	'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 	'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.apereo.cas:cas-server-support-geolocation-googlemaps:6.6.3'
 
 }
 
