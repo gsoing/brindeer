@@ -7,6 +7,7 @@ public class Coordonnee {
     private double[] location;
 
     public Coordonnee(double longitude, double latitude){
+        location = new double[2];
         location[0] = longitude;
         location[1] = latitude;
     }

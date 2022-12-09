@@ -58,23 +58,18 @@ public class UserService {
     }
 
     public Coordonnee addressToCoordinate(String address) {
-        String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&address="
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&region=FR&address="
                 + java.net.URLEncoder.encode(address, StandardCharsets.UTF_8).replace("+", "%20");
         logger.info(url);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity result = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                Map.class
-        );
-        System.out.println("resultat : " + result.getBody().toString());
+        JSONObject result = restTemplate.getForObject(url, JSONObject.class);
+        System.out.println("resultat : " + result);
 //        double latitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lat");
 //        double longitude = result.getJSONObject("results").getJSONObject("0").getJSONObject("geometry").getJSONObject("location").get("lng")
-      /*  double latitude = (double) result.get("lat"); double longitude = (double) result.get("lng");
-        logger.info("latitude = " + latitude + ", longitude = " + longitude);*/
-        return new Coordonnee(48.8,2.3);
+        double latitude = (double) result.get("lat"); double longitude = (double) result.get("lng");
+        logger.info("latitude = " + latitude + ", longitude = " + longitude);
+        return new Coordonnee(longitude,latitude);
     }
 
     public Coordonnee addressToCoordinate(JwtAuthenticationToken token) {
