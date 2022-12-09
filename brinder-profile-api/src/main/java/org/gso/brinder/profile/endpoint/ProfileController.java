@@ -10,6 +10,7 @@ import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.gso.brinder.common.dto.PageDto;
+import org.gso.brinder.profile.dto.PartialProfileDto;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
@@ -50,8 +51,8 @@ public class ProfileController {
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    public ResponseEntity<ProfileDto> createProfile(@RequestBody PartialProfileDto profileDto, JwtAuthenticationToken principal) {
+        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel(principal)).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -68,9 +69,9 @@ public class ProfileController {
 
     @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
+                                                    @RequestBody @NonNull PartialProfileDto profileDto, JwtAuthenticationToken principal) {
         profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
+        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel(principal)).toDto());
     }
 
     @GetMapping

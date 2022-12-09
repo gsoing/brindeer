@@ -1,5 +1,6 @@
 package org.gso.brinder.profile.dto;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
@@ -14,37 +15,34 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gso.brinder.profile.model.ProfileModel;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ProfileDto {
+public class PartialProfileDto {
 
     private String id;
-    @NotEmpty
-    private String userId;
-    @Email
-    private String mail;
     @Min(13)
     private int age;
-    private String firstName;
-    private String lastName;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
-    private LocalDateTime created;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
-    private LocalDateTime modified;
 
-    public ProfileModel toModel() {
+
+    public ProfileModel toModel(JwtAuthenticationToken principal) {
+        String userId = principal.getToken().getClaimAsString("sub");
+        String firstName = principal.getToken().getClaimAsString("given_name");
+        String lastName = principal.getToken().getClaimAsString("family_name");
+        String mail = principal.getToken().getClaimAsString("email");
         return ProfileModel.builder()
                 .id(this.id)
-                .userId(this.userId)
+                .userId(userId)
                 .age(this.age)
-                .firstName(this.firstName)
-                .lastName(this.lastName)
+                .mail(mail)
+                .firstName(firstName)
+                .lastName(lastName)
+                .created(LocalDateTime.now())
+                .modified(LocalDateTime.now())
                 .build();
     }
 }
