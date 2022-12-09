@@ -45,6 +45,17 @@ public class UserService {
                 coordinate.getLocation()[1]));
     }
 
+    public void updateUserLocation(JwtAuthenticationToken token, String address) {
+        Coordonnee coordinate = addressToCoordinate(address);
+        userRepository.save(new User(token.getTokenAttributes().get("sub").toString(),
+                token.getTokenAttributes().get("given_name").toString(),
+                token.getTokenAttributes().get("family_name").toString(),
+                token.getTokenAttributes().get("email").toString(),
+                (Integer) token.getTokenAttributes().get("age"),
+                coordinate.getLocation()[0],
+                coordinate.getLocation()[1]));
+    }
+
     public Coordonnee addressToCoordinate(String address) {
         String url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyC6M0Wt1zio5q8b5ZfQYiNjZU7OVE4s72s&address="
                 + java.net.URLEncoder.encode(address, StandardCharsets.UTF_8).replace("+", "%20");
