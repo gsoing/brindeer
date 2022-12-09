@@ -123,3 +123,42 @@ paths:
                 properties:
                   name:
                     type: string
+  /match/current:
+    get:
+      summary: Retourne le profile courant de l'utilisateur
+      responses:
+        '200': # status code
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /match/users/update:
+    post:
+      summary: Mettre à jour la localisation de l'utilisateur
+      responses:
+        '200': # status code
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /match/users/nearest:
+    get:
+      summary: Retourne la liste des utilisateurs aux alentours
+      responses:
+        '200': # status code
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string

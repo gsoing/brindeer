@@ -6,6 +6,7 @@ import org.gso.brinder.match.model.Coordonnee;
 import org.gso.brinder.match.model.User;
 import org.gso.brinder.match.service.UserService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users/update")
-    public void updateUserLocation(JwtAuthenticationToken token) { userService.updateUserLocation(token); }
+    public ResponseEntity<User> updateUserLocation(JwtAuthenticationToken token) { return ResponseEntity.ok(userService.updateUserLocation(token)); }
 
     @GetMapping("/users/nearest")
     public List<User> searchSurroundingUsers(JwtAuthenticationToken token) { return userService.searchSurroundingUsers(token); }
@@ -36,4 +37,9 @@ public class UserController {
 
     @GetMapping("/address/{address}")
     private Coordonnee addressToCoordinate(@PathVariable("address") String address) { return userService.addressToCoordinate(address); }
+
+    @GetMapping("/current")
+    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
+        return ResponseEntity.ok(principal);
     }
+}

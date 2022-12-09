@@ -10,6 +10,14 @@ services:
       - name: profile
         paths:
           - /profile
+  - name: match
+    url: http://match:8080/api/v1/matchs
+    plugins:
+      - name: key-auth
+    routes:
+      - name: match
+        paths:
+          - /match
 
 consumers:
   - username: sarra

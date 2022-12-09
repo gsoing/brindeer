@@ -2,7 +2,6 @@ package org.gso.brinder.match.service;
 
 import com.nimbusds.jose.shaded.json.JSONObject;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.gso.brinder.match.model.Coordonnee;
 import org.gso.brinder.match.model.User;
 import org.gso.brinder.match.repository.UserRepository;
@@ -12,14 +11,9 @@ import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResult;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.data.geo.Point;
 import org.springframework.web.client.RestTemplate;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -36,9 +30,9 @@ public class UserService {
     }
 
     // METTRE A JOUR LES COORDONNEES
-    public void updateUserLocation(JwtAuthenticationToken token) {
+    public User updateUserLocation(JwtAuthenticationToken token) {
         Coordonnee coordinate = addressToCoordinate(token);
-        userRepository.save(new User(token.getTokenAttributes().get("sub").toString(),
+       return userRepository.save(new User(token.getTokenAttributes().get("sub").toString(),
                 token.getTokenAttributes().get("given_name").toString(),
                 token.getTokenAttributes().get("family_name").toString(),
                 token.getTokenAttributes().get("email").toString(),
