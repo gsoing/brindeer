@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.profile.dto.ProfileDto;
+import org.gso.brinder.profile.dto.ProfileUpdateDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
 import org.springframework.data.domain.Page;
@@ -49,33 +50,34 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    @PostMapping(value="", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileUpdateDto profileUpdateDto, Principal principal) {
+        ProfileDto createdProfile = profileService.createProfile(profileUpdateDto.toCreateModel(principal)).toProfileDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(createdProfile.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(createdProfile);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
-        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
+        return ResponseEntity.ok(profileService.getProfile(profileId).toProfileDto());
     }
 
     @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
+                                                          @RequestBody @NonNull ProfileUpdateDto profileUpdateDto,
+                                                          Principal principal) {
+        profileUpdateDto.setId(profileId);
+        return ResponseEntity.ok(profileService.updateProfile(profileUpdateDto.toUpdateModel(principal)).toProfileDto());
     }
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
+                                                                   @PageableDefault(size = 20) Pageable pageable) {
         Pageable checkedPageable  = checkPageSize(pageable);
         Criteria criteria = convertQuery(query);
         Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
@@ -87,7 +89,7 @@ public class ProfileController {
 
     @GetMapping(params = "mail")
     public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
+                                                                  @PageableDefault(size = 20) Pageable pageable) {
         Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
@@ -125,7 +127,7 @@ public class ProfileController {
     }
 
     private PageDto<ProfileDto> toPageDto(Page<ProfileModel> results) {
-        List<ProfileDto> profiles = results.map(ProfileModel::toDto).toList();
+        List<ProfileDto> profiles = results.map(ProfileModel::toProfileDto).toList();
         PageDto<ProfileDto> pageResults = new PageDto<>();
         pageResults.setData(profiles);
         pageResults.setTotalElements(results.getTotalElements());

@@ -1,0 +1,16 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: profile
+    url: http://172.20.0.1:9080/api/v1/profiles
+    routes:
+      - name: profiles
+        paths:
+          - /profiles
+  - name: match
+      url: http://172.20.0.1:9081/api/v1/matches
+      routes:
+        - name: matches
+          paths:
+            - /matches

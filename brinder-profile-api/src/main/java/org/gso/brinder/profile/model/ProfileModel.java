@@ -3,13 +3,13 @@ package org.gso.brinder.profile.model;
 import java.time.LocalDateTime;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gso.brinder.profile.dto.ProfileDto;
+import org.gso.brinder.profile.dto.ProfileUpdateDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -35,7 +35,14 @@ public class ProfileModel {
     @LastModifiedDate
     private LocalDateTime modified;
 
-    public ProfileDto toDto() {
+    public ProfileUpdateDto toProfileUpdateDto() {
+        return ProfileUpdateDto.builder()
+                .id(this.id)
+                .age(this.age)
+                .build();
+    }
+
+    public ProfileDto toProfileDto() {
         return ProfileDto.builder()
                 .id(this.id)
                 .userId(this.userId)
@@ -47,4 +54,5 @@ public class ProfileModel {
                 .modified(this.modified)
                 .build();
     }
+
 }
