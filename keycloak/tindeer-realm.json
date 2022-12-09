@@ -423,8 +423,8 @@
   "otpPolicyPeriod": 30,
   "otpPolicyCodeReusable": false,
   "otpSupportedApplications": [
-    "totpAppGoogleName",
-    "totpAppFreeOTPName"
+    "totpAppFreeOTPName",
+    "totpAppGoogleName"
   ],
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicySignatureAlgorithms": [
@@ -1154,6 +1154,39 @@
             "access.token.claim": "true",
             "claim.name": "birthdate",
             "jsonType.label": "String"
+          }
+        },
+        {
+          "id": "1891c81c-335a-446e-ace5-e4e4bff30bcb",
+          "name": "address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "aggregate.attrs": "false",
+            "userinfo.token.claim": "true",
+            "multivalued": "false",
+            "user.attribute": "address",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "address"
+          }
+        },
+        {
+          "id": "cde077e6-1977-4841-b618-8a63b72a7b7f",
+          "name": "age",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "aggregate.attrs": "false",
+            "userinfo.token.claim": "true",
+            "multivalued": "false",
+            "user.attribute": "age",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "age",
+            "jsonType.label": "int"
           }
         },
         {
