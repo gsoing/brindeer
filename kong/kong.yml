@@ -1,0 +1,25 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: profile
+    url: http://profile:8080/api/v1/profiles
+    plugins:
+      - name: key-auth
+    routes:
+      - name: profiles
+        paths:
+          - /profiles
+  - name: match
+    url: http://match:8080/api/v1/match
+    plugins:
+      - name: key-auth
+    routes:
+      - name: match
+        paths:
+          - /match
+
+consumers:
+- username: tomi
+  keyauth_credentials:
+  - key: tomi

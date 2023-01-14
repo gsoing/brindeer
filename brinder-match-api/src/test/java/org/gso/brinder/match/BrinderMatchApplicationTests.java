@@ -1,10 +1,10 @@
-package org.gso.brinder.profile;
+package org.gso.brinder.match;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BrinderProfileApplicationTests {
+class BrinderMatchApplicationTests {
 
 	@Test
 	void contextLoads() {
