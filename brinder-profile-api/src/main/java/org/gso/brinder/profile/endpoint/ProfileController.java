@@ -1,8 +1,5 @@
 package org.gso.brinder.profile.endpoint;
 
-import java.security.Principal;
-import java.util.List;
-
 import com.github.rutledgepaulv.qbuilders.builders.GeneralQueryBuilder;
 import com.github.rutledgepaulv.qbuilders.conditions.Condition;
 import com.github.rutledgepaulv.qbuilders.visitors.MongoVisitor;
@@ -24,15 +21,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,31 +42,45 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    @PostMapping("/create")
+    public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal) {
+        LocalDateTime timestamp = LocalDateTime.now();
+
+        ProfileModel profileModel = new ProfileModel(
+                principal.getToken().getId(),
+                principal.getTokenAttributes().get("sub").toString(),
+                principal.getTokenAttributes().get("email").toString(),
+                //Integer.parseInt(principal.getTokenAttributes().get("age").toString()),
+                20,
+                principal.getTokenAttributes().get("given_name").toString(),
+                principal.getTokenAttributes().get("family_name").toString(),
+                timestamp,
+                timestamp);
+
+        ProfileDto createdProfile = profileService.createProfile(profileModel).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(createdProfile.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(createdProfile);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
-        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
+    @GetMapping("/read")
+    public ResponseEntity<ProfileDto> getProfile(JwtAuthenticationToken principal) {
+        return ResponseEntity.ok(profileService.getProfile(principal.getToken().getId()).toDto());
     }
 
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
+    @PutMapping(path = "update", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateProfile(JwtAuthenticationToken principal,
                                                     @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
+        profileDto.setId(principal.getToken().getId());
+        System.out.println(profileDto);
         return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
     }
 
-    @GetMapping
+   @GetMapping("/search")
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
                                                              @PageableDefault(size = 20) Pageable pageable) {
         Pageable checkedPageable  = checkPageSize(pageable);
@@ -85,10 +92,10 @@ public class ProfileController {
                 .body(pageResults);
     }
 
-    @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
+    @GetMapping(path = "/search", params = "email")
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String email,
                                                              @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
+        Page<ProfileModel> results = profileService.searchByMail(email, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
                 .status(HttpStatus.OK)

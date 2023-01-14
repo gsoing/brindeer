@@ -4,10 +4,16 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
+  - url: http://localhost:8000/
+    description: API Manager
   - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
+    description: Environnement de test Profile Docker
   - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+    description: Environnement de test Profile Local
+  - url: http://localhost:9060/api/v1
+    description: Environnement de test Match Docker
+  - url: http://localhost:9070/api/v1
+    description: Environnement de test Match Local
 components:
   securitySchemes:
     oAuthSample:    # <---- arbitrary name
@@ -20,6 +26,26 @@ components:
           scopes:
             profile: access profile
             email: access email
+  schemas:
+    profile:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        mail:
+          type: string
+        age:
+          type: integer
+        firstname:
+          type: string
+        lastname:
+          type: string
+        created:
+          type: integer
+        modified:
+          type: integer
 security: 
   - oAuthSample: 
     - profile
@@ -38,4 +64,60 @@ paths:
                 properties:
                   name:
                     type: string
-                    
+  /profiles/create:
+    post:
+      summary: Création du profil de l'utilisateur courant
+      responses:
+        200:
+          description: Profil crée
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /profiles/update:
+    put:
+      summary: Mise à jour du profil de l'utilisateur courant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/profile"
+      responses:
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /match/update:
+    post:
+      summary: Mise à jour de la localisation de l'utilisateur courant
+      responses:
+        '200':
+          description: Localisation mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+  /match/search:
+    get:
+      summary: Retourne la liste des utilisateurs dans un rayon de 100 mètres
+      responses:
+        '200':
+          description: Retourne une liste d'utilisateur
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
