@@ -4,8 +4,12 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
+  - url: http://localhost:8000/api/v1
+    description: kong  
   - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
+    description: Microservice Profile - Environnement de test Docker
+  - url: http://localhost:9081/api/v1
+    description: Microservice Match - Environnement de test Docker 
   - url: http://localhost:9090/api/v1
     description: Environnement de test local
 components:
@@ -20,10 +24,67 @@ components:
           scopes:
             profile: access profile
             email: access email
-security: 
-  - oAuthSample: 
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+  schemas:
+    ProfileDto:
+      type: object
+      required:
+        - userId
+        - mail
+        - age
+      properties:
+        id:
+          type: string
+          description: Identifiant unique du profil
+        userId:
+          type: string
+          description: Identifiant unique de l'utilisateur
+        mail:
+          type: string
+          format: email
+          description: Adresse mail de l'utilisateur
+        age:
+          type: integer
+          format: int32
+          description: Âge de l'utilisateur
+        firstName:
+          type: string
+          description: Prénom de l'utilisateur
+        lastName:
+          type: string
+          description: Nom de famille de l'utilisateur
+        created:
+          type: string
+          format: date-time
+          description: Date et heure de création du profil
+        modified:
+          type: string
+          format: date-time
+          description: Date et heure de la dernière modification du profil
+    UserLocation:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Identifiant unique de l'utilisateur
+        longitude:
+          type: number
+          format: double
+          description: Longitude de la localisation de l'utilisateur
+        latitude:
+          type: number
+          format: double
+          description: Latitude de la localisation de l'utilisateur
+security:
+  - oAuthSample:
     - profile
     - email
+  - apiKeyAuth:
+    - abcd        
+
 paths:
   /profiles/current:
     get:
@@ -38,4 +99,95 @@ paths:
                 properties:
                   name:
                     type: string
-                    
+  /profiles:
+    post:
+      summary: Crée un nouveau profil
+      description: Crée un nouveau profil avec l'âge fourni par l'utilisateur. Les autres informations sont déduites automatiquement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - age
+              properties:
+                age:
+                  type: integer
+                  format: int32
+                  description: Âge de l'utilisateur
+                  example: 25
+      responses:
+        '201':
+          description: Profil créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+        '400':
+          description: Données de la requête invalides   
+        '409':
+          description: Le profil existe déjà, veuillez créer un autre compte depuis keycloak           
+  /locations/update:
+    post:
+      summary: Met à jour la localisation de l'utilisateur
+      description: >
+        Met à jour la longitude et la latitude pour l'utilisateur identifié par le JWT fourni.
+        Note: Cette API est disponible sur le serveur Microservice Match.
+      operationId: updateLocation
+      security:
+        - apiKeyAuth: []
+        - oAuthSample: [email]
+      parameters:
+        - in: query
+          name: longitude
+          required: true
+          schema:
+            type: number
+            format: double
+          description: Longitude de la nouvelle localisation de l'utilisateur.
+          example: 5.00000001
+        - in: query
+          name: latitude
+          required: true
+          schema:
+            type: number
+            format: double
+          description: Latitude de la nouvelle localisation de l'utilisateur.
+          example: 5.00000001
+      responses:
+        '200':
+          description: Localisation mise à jour avec succès. Retourne la localisation mise à jour.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLocation'
+        '401':
+          description: Non autorisé si le JWT n'est pas fourni ou invalide.
+        '404':
+          description: Non trouvé si le profil de l'utilisateur n'existe pas.
+        '400':
+          description: Requête invalide si les paramètres longitude ou latitude ne sont pas fournis.
+  /locations/matches:
+    get:
+      summary: Trouve des correspondances à proximité pour l'utilisateur dans un rayon de 100m.
+      description: >
+        Retourne une liste de localisations d'utilisateurs correspondant à proximité de l'utilisateur actuel, identifié par le JWT fourni.
+        Note: Cette API est disponible sur le serveur Microservice Match.
+      operationId: findMatchesNearby
+      security:
+        - apiKeyAuth: []
+        - oAuthSample: [email]
+      responses:
+        '200':
+          description: Liste des correspondances à proximité trouvées avec succès.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserLocation'
+        '401':
+          description: Non autorisé si le JWT n'est pas fourni ou invalide.
+        '404':
+          description: Non trouvé si le profil de l'utilisateur n'existe pas ou si l'utilisateur n'as pas fourni sa localisation.

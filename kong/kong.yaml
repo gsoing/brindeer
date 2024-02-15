@@ -1,0 +1,59 @@
+_format_version: "3.0"
+_transform: true
+ 
+services:
+- name: profiles-service-get-current
+  url: http://profile:8080/api/v1/profiles/current
+- name: profiles-service-create-profiles
+  url: http://profile:8080/api/v1/profiles
+ 
+- name: match-service-locations-update
+  url: http://match:8080/api/v1/locations/update
+- name: match-service-locations-matches
+  url: http://match:8080/api/v1/locations/matches
+ 
+routes:
+  - name: profiles-route-get-current
+    service: profiles-service-get-current
+    paths:
+    - /api/v1/profiles/current
+  - name: profiles-route-create-profiles
+    service: profiles-service-create-profiles
+    paths:
+    - /api/v1/profiles
+
+  - name: match-route-locations-update
+    service: match-service-locations-update
+    paths:
+    - /api/v1/locations/update
+  - name: match-route-locations-matches
+    service: match-service-locations-matches
+    paths:
+    - /api/v1/locations/matches
+    
+
+consumers:
+- username: swagger
+  keyauth_credentials:
+  - key: abcd
+
+plugins:
+- name: key-auth
+  config:
+    key_names: ["api_key"]  
+
+- name: cors
+  config:
+    origins:
+      - http://localhost:8888
+    methods:
+      - GET
+      - POST
+    headers:
+      - Content-Type
+      - Authorization
+      - api_key
+    exposed_headers:
+      - X-Total-Count
+    credentials: true
+    max_age: 3600

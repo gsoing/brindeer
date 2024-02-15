@@ -42,9 +42,12 @@ public class ProfileDto {
         return ProfileModel.builder()
                 .id(this.id)
                 .userId(this.userId)
+                .mail(this.mail)
                 .age(this.age)
                 .firstName(this.firstName)
                 .lastName(this.lastName)
+                .created(this.created)
+                .modified(this.modified)
                 .build();
     }
 }

@@ -23,6 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +35,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+
 
 @Slf4j
 @RestController
@@ -49,17 +55,46 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
+    // @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    // public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
+    //     ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    //     return ResponseEntity
+    //             .created(
+    //                     ServletUriComponentsBuilder.fromCurrentContextPath()
+    //                             .path(createdProdile.getId())
+    //                             .build()
+    //                             .toUri()
+    //             ).body(createdProdile);
+    // }
+
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
-        return ResponseEntity
-                .created(
-                        ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
-                                .build()
-                                .toUri()
-                ).body(createdProdile);
+    public ResponseEntity<ProfileDto> createProfile(@AuthenticationPrincipal Jwt jwt, @RequestBody ProfileDto profileDto) {
+
+        String userId = jwt.getClaimAsString("sid");
+        String email = jwt.getClaimAsString("email");
+        String firstName = jwt.getClaimAsString("given_name");
+        String lastName = jwt.getClaimAsString("family_name");
+        LocalDateTime now = LocalDateTime.now();
+    
+        Page<ProfileModel> existingProfile = profileService.searchByMail(email, PageRequest.of(0, 20));
+    
+        if (!existingProfile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(existingProfile.getContent().get(0).toDto()); // Assurez-vous d'avoir une méthode toDto dans ProfileModel
+        } else {
+            profileDto.setUserId(userId);
+            profileDto.setMail(email);
+            profileDto.setFirstName(firstName);
+            profileDto.setLastName(lastName);
+            profileDto.setCreated(now);
+            profileDto.setModified(now);
+            
+            ProfileDto createdProfile = profileService.createProfile(profileDto.toModel()).toDto();
+            return ResponseEntity
+                .created(ServletUriComponentsBuilder.fromCurrentContextPath().path(createdProfile.getId()).build().toUri())
+                .body(createdProfile);
+        }
     }
+    
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
