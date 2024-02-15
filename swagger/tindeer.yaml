@@ -1,41 +1,139 @@
 openapi: 3.0.0
 info:
-  title: Tindeer API
-  description: Notre super API pour notre application mobile de rencontre de Rennes
+  title: Profile Controller API
+  description: API for managing user profiles
   version: 1.0.0
 servers:
-  - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
-components:
-  securitySchemes:
-    oAuthSample:    # <---- arbitrary name
-      type: oauth2
-      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
-      flows:
-        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
-          authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
-          tokenUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/token
-          scopes:
-            profile: access profile
-            email: access email
-security: 
-  - oAuthSample: 
-    - profile
-    - email
+  - url: http://localhost:8080/api/v1
 paths:
-  /profiles/current:
-    get:
-      summary: Retourne le profile courant de l'utilisateur
+  /profiles:
+    post:
+      summary: Create a new profile
+      operationId: createProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
       responses:
-        '200':    # status code
-          description: A JSON array of user names
+        '201':
+          description: Profile created successfully
           content:
             application/json:
-              schema: 
-                type: object
-                properties:
-                  name:
-                    type: string
-                    
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+    get:
+      summary: Get the profile of the current user
+      operationId: getProfile
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+    put:
+      summary: Update the profile of the current user
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/{id}:
+    get:
+      summary: Get a profile by ID
+      operationId: getProfileById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+    put:
+      summary: Update a profile by ID
+      operationId: updateProfileById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/search:
+    get:
+      summary: Search profiles
+      operationId: searchProfiles
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Profiles retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageDtoProfileDto'
+components:
+  schemas:
+    ProfileDto:
+      type: object
+      properties:
+        userId:
+          type: string
+        # Add other properties here
+    PageDtoProfileDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileDto'
+        totalElements:
+          type: integer
+        pageSize:
+          type: integer
+        next:
+          type: string
+        first:
+          type: string
+        last:
+          type: string
