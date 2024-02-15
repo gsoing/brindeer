@@ -28,6 +28,8 @@ public class ProfileService {
     public ProfileModel updateProfile(ProfileModel profileToUpdate) {
         ProfileModel profileModel = this.getProfile(profileToUpdate.getId());
         profileModel.setUserId(profileToUpdate.getUserId());
+        profileModel.setAge(profileToUpdate.getAge());
+        profileModel.setModified(profileToUpdate.getModified());
         return profileRepository.save(profileModel);
     }
 

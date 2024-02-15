@@ -41,6 +41,40 @@ components:
           type: string
         geoCoordinates:
           $ref: '#/components/schemas/GeoCoordinates'
+    ProfileDto:
+  type: object
+  required:
+    - userId
+  properties:
+    id:
+      type: string
+      description: Unique identifier for the Profile
+    userId:
+      type: string
+      description: User identifier, must not be empty
+    mail:
+      type: string
+      format: email
+      description: Email address of the user
+    age:
+      type: integer
+      format: int32
+      minimum: 13
+      description: Age of the user, must be at least 13
+    firstName:
+      type: string
+      description: First name of the user
+    lastName:
+      type: string
+      description: Last name of the user
+    created:
+      type: string
+      format: 'date-time'
+      description: Date and time when the profile was created, in YYYY-MM-DD HH:mm:ss format
+    modified:
+      type: string
+      format: 'date-time'
+      description: Date and time when the profile was last modified, in YYYY-MM-DD HH:mm:ss format
 security:
   - oAuthSample:
       - profile
@@ -135,3 +169,81 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MatchedUser'
+  /profiles:
+    post:
+      summary: Crée un nouveau profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '201':
+          description: Profil créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/profile:
+    get:
+      summary: Retourne le profil de l'utilisateur courant
+      responses:
+        '200':
+          description: Profil d'utilisateur courant retourné avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/update:
+    put:
+      summary: Met à jour le profil d'un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '200':
+          description: Profil d'utilisateur mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/search:
+    get:
+      summary: Recherche des profils basés sur une requête
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des profils correspondants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileDto'
+  /profiles/{mail}:
+    get:
+      summary: Recherche des profils par mail
+      parameters:
+        - name: mail
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des profils correspondants par mail
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileDto'
