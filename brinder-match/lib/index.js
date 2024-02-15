@@ -1,16 +1,12 @@
 const express = require('express');
+const userRoutes = require('./routes/users');
 const app = express();
 const PORT = 3000;
 
-let users = [
-    { id: 1, name: 'John Doe', email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
-];
+app.use(express.json());
 
-app.get('/users', (req, res) => {
-    res.json(users);
-});
+app.use('/users', userRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Serveur démarré sur le port ${PORT}`);
+    console.log(`Server started on port : ${PORT}`);
 });
