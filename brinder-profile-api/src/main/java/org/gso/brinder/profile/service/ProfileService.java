@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +40,4 @@ public class ProfileService {
     public Page<ProfileModel> searchByMail(String mail, Pageable pageable) {
         return profileRepository.findByMail(mail, pageable);
     }
-
 }
