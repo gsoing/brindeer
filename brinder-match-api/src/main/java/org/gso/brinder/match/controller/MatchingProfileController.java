@@ -1,21 +1,25 @@
 package org.gso.brinder.match.controller;
 
-
 import org.gso.brinder.match.model.GeoCoordinates;
 import org.gso.brinder.match.model.MatchedUser;
 import org.gso.brinder.match.service.MatchedUserService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/v1/match")
+@RequestMapping(value = "/api/v1/match", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MatchingProfileController {
 
     private final MatchedUserService matchedUserService;
@@ -24,30 +28,29 @@ public class MatchingProfileController {
         this.matchedUserService = matchedUserService;
     }
 
-// In MatchingProfileController
+    @PostMapping(value = "/createorupdate", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MatchedUser> createOrUpdateMatchedUserProfile(@RequestBody GeoCoordinates geoCoordinates, Principal principal) {
+        log.debug("Received request to create or update matched user profile. Principal name: {}", principal.getName());
 
-    @PostMapping("/create")
-    public ResponseEntity<MatchedUser> createLocationProfile(@RequestBody GeoCoordinates geoCoordinates, @AuthenticationPrincipal JwtAuthenticationToken principal) {
-        String userId = principal.getToken().getClaimAsString("sub");
-        String firstName = principal.getToken().getClaimAsString("given_name");
-        String lastName = principal.getToken().getClaimAsString("family_name");
+        MatchedUser savedProfile = getDataFromToken(principal);
+        log.debug("MatchedUser retrieved from token: {}", savedProfile);
 
-        MatchedUser userMatchProfile = MatchedUser.builder()
-                .idMatchedUser(userId)
-                .firstName(firstName)
-                .lastName(lastName)
-                .geoCoordinates(geoCoordinates)
-                .build();
+        savedProfile.setGeoCoordinates(geoCoordinates);
+        log.debug("Set GeoCoordinates for user: {}, {}", geoCoordinates.getLatitude(), geoCoordinates.getLongitude());
 
-        MatchedUser savedProfile = matchedUserService.createLocationProfile(userMatchProfile);
+        MatchedUser showProfile = matchedUserService.createOrUpdateMatchedUserProfile(savedProfile);
+        log.debug("MatchedUser profile saved or updated: {}", showProfile);
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedProfile.getIdMatchedUser()).toUri();
-        return ResponseEntity.created(location).body(savedProfile);
+                .buildAndExpand(showProfile.getIdMatchedUser()).toUri();
+        log.debug("Created location URI for the saved or updated profile: {}", location);
+
+        return ResponseEntity.created(location).body(showProfile);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<MatchedUser>> getAllUserMatchProfiles(Pageable pageable) {
-        List<MatchedUser> profiles = matchedUserService.findLocationsProfile(pageable);
+        List<MatchedUser> profiles = matchedUserService.findAllMatchedUserProfiles(pageable);
         return ResponseEntity.ok(profiles);
     }
 
@@ -58,15 +61,20 @@ public class MatchingProfileController {
     }
 
     @GetMapping("/nearby")
-    public ResponseEntity<List<MatchedUser>> findNearbyUserMatchProfiles(@AuthenticationPrincipal JwtAuthenticationToken principal) {
+    public ResponseEntity<List<MatchedUser>> findNearbyUserMatchProfiles(@RequestParam double distance, @AuthenticationPrincipal JwtAuthenticationToken principal) {
+        // Assuming distance is provided in kilometers for simplicity; adjust accordingly if needed
         String userId = principal.getToken().getClaimAsString("sub");
-        List<MatchedUser> nearbyProfiles = matchedUserService.findByDistance(userId);
+        List<MatchedUser> nearbyProfiles = matchedUserService.findMatchedUsersNearby(userId, distance);
         return ResponseEntity.ok(nearbyProfiles);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MatchedUser> updateMatchProfile(@PathVariable String id, @RequestBody String address) {
-        MatchedUser updatedProfile = matchedUserService.updateLocationProfile(id, address);
-        return ResponseEntity.ok(updatedProfile);
+
+    public MatchedUser getDataFromToken(Principal principal) {
+        JwtAuthenticationToken jwtAuthToken = (JwtAuthenticationToken) principal;
+        return new MatchedUser(jwtAuthToken.getToken().getClaimAsString("sub"),
+        jwtAuthToken.getToken().getClaimAsString("given_name"),
+        jwtAuthToken.getToken().getClaimAsString("family_name"));
+
     }
+
 }
