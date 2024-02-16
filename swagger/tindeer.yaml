@@ -10,20 +10,20 @@ servers:
     description: Environnement de test local
 components:
   securitySchemes:
-    oAuthSample:    # <---- arbitrary name
+    oAuthSample:
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
       flows:
-        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
+        authorizationCode:
           authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
           tokenUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/token
           scopes:
             profile: access profile
             email: access email
-security: 
-  - oAuthSample: 
-    - profile
-    - email
+security:
+  - oAuthSample:
+      - profile
+      - email
 paths:
   /profiles/current:
     get:
@@ -33,9 +33,84 @@ paths:
           description: A JSON array of user names
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   name:
                     type: string
-                    
+
+  /profiles/create:
+    post:
+      summary: Crée le profile d'un utilisateur
+      responses:
+        '201':
+          description: Profile créé
+        '400':
+          description: Données invalides fournies
+
+  /profiles/{id}:
+    get:
+      summary: Récupère le profil d'un utilisateur grâce à son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails du profil utilisateur
+        '404':
+          description: Profil non trouvé
+
+    put:
+      summary: Met à jour le profil d'un utilisateur
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profil mis à jour
+        '400':
+          description: Données invalides fournies
+        '404':
+          description: Profil non trouvé
+
+  /profiles/search:
+    get:
+      summary: Recherche de profils
+      responses:
+        '200':
+          description: Liste des profils correspondants
+
+  /profiles/search-by-mail:
+    get:
+      summary: Recherche de profils par e-mail
+      responses:
+        '200':
+          description: Liste des profils correspondants
+
+  /matchs/users:
+    get:
+      summary: Récupère les utilisateurs à 100m
+      responses:
+        '200':
+          description: Liste des utilisateurs proches
+
+  /matchs:
+    post:
+      summary: Crée un match
+      responses:
+        '201':
+          description: Match créé
+        '400':
+          description: Données invalides fournies
+
+    get:
+      summary: Voir les personnes avec qui on a matché
+      responses:
+        '200':
+          description: Liste des matchs
