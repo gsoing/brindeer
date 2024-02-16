@@ -4,43 +4,23 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
-  - url: http://localhost:8000/
-    description: Brindeer App
+  - url: http://localhost:9080/api/v1
+    description: Environnement de test Docker
+  - url: http://localhost:9090/api/v1
+    description: Environnement de test local
 components:
-  schemas:
-    ProfileDto:
-      type: object
-      properties:
-        id:
-          type: string
-        userId:
-          type: string
-        mail:
-          type: string
-        age:
-          type: integer
-        firstname:
-          type: string
-        lastname:
-          type: string
-        created:
-          type: integer
-        updated:
-          type: integer
-    securitySchemes:
-      ApiKeyAuth:
-        type: apiKey
-        in: header
-        name: apikey
-        oAuthSample: # <---- arbitrary name
-          type: oauth2
-          description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+  securitySchemes:
+    oAuthSample:    # <---- arbitrary name
+      type: oauth2
+      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      flows:
+        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
+          authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
+          tokenUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/token
           scopes:
             profile: access profile
             email: access email
-
 security:
-  - ApiKeyAuth: [ ]
   - oAuthSample:
       - profile
       - email
