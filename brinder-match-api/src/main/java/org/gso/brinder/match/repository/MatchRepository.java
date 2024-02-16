@@ -1,5 +1,7 @@
 package org.gso.brinder.match.repository;
 
+import java.util.Optional;
+
 import org.gso.brinder.match.model.ProfileModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,5 +13,5 @@ import org.springframework.stereotype.Repository;
 public interface MatchRepository
         extends PagingAndSortingRepository<ProfileModel, String>, CrudRepository<ProfileModel, String> {
 
-
+    Optional<ProfileModel> findByMail(String email);
 }

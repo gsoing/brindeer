@@ -1,7 +1,9 @@
 package org.gso.brinder.match.endpoint;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.match.dto.ProfileDto;
 import org.gso.brinder.match.model.ProfileModel;
@@ -48,6 +50,29 @@ public class MatchController {
     private final MatchService matchService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
+    @PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateLocation(@RequestBody GeoJsonPoint location,
+            @AuthenticationPrincipal Jwt principal) {
+
+        Object email = principal.getClaims().get("email");
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        Optional<ProfileModel> optionalProfile = matchService.findByEmail(email.toString());
+        if (!optionalProfile.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        ProfileModel profile = optionalProfile.get();
+        profile.setLocation(location);
+
+        System.out.println(profile);
+
+        return ResponseEntity
+                .ok()
+                .body(matchService.updateProfileLocation(profile).toDto());
+    }
 
     /**
      * Convertit une "requête RSQL en un objet Criteria compréhensible par la base
