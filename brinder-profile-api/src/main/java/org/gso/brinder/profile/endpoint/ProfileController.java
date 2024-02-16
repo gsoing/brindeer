@@ -13,9 +13,11 @@ import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -50,7 +52,7 @@ public class ProfileController {
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
     // Utiliser JwtAuthenticationToken pour obtenir les informations de l'utilisateur connecté
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal, @RequestBody ProfileDto profileDto) {
         // Utiliser l'ID de l'utilisateur connecté pour créer le profil
         String userId = principal.getName();
@@ -67,10 +69,10 @@ public class ProfileController {
 
     @GetMapping
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(JwtAuthenticationToken principal, @RequestParam(required = false) String query,
-                                                             @PageableDefault(size =  20) Pageable pageable) {
+                                                             @PageableDefault(size = 20) Pageable pageable) {
         // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
         String userId = principal.getName();
-        Pageable checkedPageable  = checkPageSize(pageable);
+        Pageable checkedPageable = checkPageSize(pageable);
         Criteria criteria = convertQuery(query);
         Page<ProfileModel> results = profileService.searchProfilesByUserId(userId, criteria, checkedPageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
@@ -92,7 +94,7 @@ public class ProfileController {
     }
 
     // Supprimer le paramètre d'entrée profileId car il n'est plus nécessaire
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    @PutMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ProfileDto> updateProfile(JwtAuthenticationToken principal, @RequestBody @NonNull ProfileDto profileDto) {
         // Utiliser l'ID de l'utilisateur connecté pour mettre à jour son profil
         String userId = principal.getName();
@@ -101,9 +103,9 @@ public class ProfileController {
     }
 
 
-    @GetMapping(params = "/mail")
+    @GetMapping(params = "mail")
     public ResponseEntity<SpringDataJaxb.PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail,
-                                                                           @PageableDefault(size =  20) Pageable pageable) {
+                                                                           @PageableDefault(size = 20) Pageable pageable) {
         // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
         String userId = principal.getName();
         Page<ProfileModel> results = profileService.searchByMail(userId, mail, pageable);
