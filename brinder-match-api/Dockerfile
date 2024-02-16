@@ -1,11 +1,14 @@
-FROM brinder-common as compile
-ADD . /home/source/java
-WORKDIR /home/source/java
+FROM gradle:latest as compile
+COPY . /app
+WORKDIR /app
+RUN ls
+USER root
+RUN chown -R gradle /app
+USER gradle
+RUN gradle clean build
 
-RUN gradle build --no-daemon
-
-FROM eclipse-temurin:17-jre
-WORKDIR /home/application/java
-COPY --from=compile "/home/source/java/build/libs/application.jar" .
+FROM openjdk:17-alpine
+WORKDIR /app
+COPY --from=compile "/app/build/libs/brinder-match-0.0.1-SNAPSHOT.jar" /app/
 EXPOSE 8080
-ENTRYPOINT [ "java", "-jar", "/home/application/java/application.jar"]
+ENTRYPOINT ["java", "-jar", "brinder-match-0.0.1-SNAPSHOT.jar"]
