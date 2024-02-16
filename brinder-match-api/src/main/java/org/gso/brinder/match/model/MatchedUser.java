@@ -2,6 +2,7 @@ package org.gso.brinder.match.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexType;
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,7 +24,7 @@ public class MatchedUser {
     private String firstName;
     private String lastName;
 
-    @GeoSpatialIndexed // This annotation ensures the field is geospatially indexed
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)// This annotation ensures the field is geospatially indexed
     private GeoCoordinates geoCoordinates;
 
     public MatchedUser toDto() {

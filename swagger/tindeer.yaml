@@ -4,10 +4,12 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
+  - url: http://localhost:8000/api/v1
+    description: kong
   - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
+    description: environnement de test profile-api
   - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+    description: Environnement de test match-api
 components:
   securitySchemes:
     oAuthSample:
@@ -20,6 +22,10 @@ components:
           scopes:
             profile: access profile
             email: access email
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
   schemas:
     GeoJsonPoint:
       type: object
@@ -55,7 +61,7 @@ components:
         lastName:
           type: string
         geoCoordinates:
-          $ref: '#/components/schemas/GeoCoordinates'
+          $ref: '#/components/schemas/GeoCoordinates'      
     ProfileDto:
       type: object
       required:
@@ -94,13 +100,12 @@ security:
   - oAuthSample:
       - profile
       - email
+  - apiKeyAuth:
+      - abcd  
 paths:
   /profiles/current:
     get:
       summary: Retourne le profil courant de l'utilisateur
-      security:
-        - oAuthSample:
-            - profile
       responses:
         '200':
           description: Profil d'utilisateur courant retourné avec succès
@@ -116,7 +121,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MatchedUser'
+              $ref: '#/components/schemas/GeoCoordinates'
       responses:
         '201':
           description: Matched user profile successfully created or updated
@@ -129,19 +134,6 @@ paths:
   /match/all:
     get:
       summary: Returns all user match profiles with pagination
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-          required: false
-          description: Page number of the user match profiles
-        - in: query
-          name: size
-          schema:
-            type: integer
-          required: false
-          description: Number of user match profiles per page
       responses:
         '200':
           description: List of user match profiles
@@ -169,19 +161,16 @@ paths:
                 $ref: '#/components/schemas/MatchedUser'
         '404':
           description: User match profile not found
-  /match/nearby:
+  /match/nearby/{distance}:
     get:
       summary: Returns nearby user match profiles based on distance
       parameters:
         - name: distance
-          in: query
+          in: path
           required: true
           schema:
             type: number
-            format: double
             description: Distance in kilometers
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: List of nearby user match profiles successfully returned

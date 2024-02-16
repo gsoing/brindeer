@@ -2,6 +2,3 @@ spring:
   data:
     mongodb:
       host: mongo
-keycloak:
-  auth-server-url: http://localhost:8080/auth
-  proxy-url:  http://keycloak:8080/auth

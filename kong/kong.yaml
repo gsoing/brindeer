@@ -1,0 +1,114 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+- name: profiles-service-get-current
+  url: http://brinder-profile-api:8080/api/v1/profiles/current
+
+- name: profiles-service-create-profiles
+  url: http://brinder-profile-api:8080/api/v1/profiles
+
+- name: profiles-service-get-current-v2
+  url: http://brinder-profile-api:8080/api/v1/profiles/profile
+
+- name: profiles-service-update-profiles
+  url: http://brinder-profile-api:8080/api/v1/profiles/update
+
+- name: profiles-service-search
+  url: http://brinder-profile-api:8080/api/v1/profiles/search
+
+- name: profiles-service-search-by-mail
+  url: http://brinder-profile-api:8080/api/v1/profiles/(?<mail>[^/]+)
+
+- name: match-service-matches-createorupdate
+  url: http://brinder-match-api:8080/api/v1/match/createorupdate
+
+- name: match-service-matches-all
+  url: http://brinder-match-api:8080/api/v1/match/all
+
+- name: match-service-matches-nearby
+  url: http://brinder-match-api:8080/api/v1/match/nearby/(?<distance>[^/]+)
+
+- name: match-service-search-by-id
+  url: http://brinder-match-api:8080/api/v1/match
+
+routes:
+  - name: profiles-route-get-current
+    service: profiles-service-get-current
+    paths:
+    - /api/v1/profiles/current
+
+  - name: profiles-route-create-profiles
+    service: profiles-service-create-profiles
+    paths:
+    - /api/v1/profiles
+
+  - name: profiles-service-get-current-v2
+    service: profiles-service-get-current-v2
+    paths:
+    - /api/v1/profiles/profile
+
+  - name: profiles-service-update-profiles
+    service: profiles-service-update-profiles
+    paths:
+    - /api/v1/profiles/update
+
+  - name: profiles-service-search
+    service: profiles-service-search
+    paths:
+    - /api/v1/profiles/search
+
+  - name: profiles-service-search-by-mail
+    service: profiles-service-search-by-mail
+    paths:
+    - /api/v1/profiles/(?<mail>[^/]+)
+
+  - name: match-route-matches-createorupdate
+    service: match-service-matches-createorupdate
+    paths:
+    - /api/v1/match/createorupdate
+
+  - name: match-route-matches-all
+    service: match-service-matches-all
+    paths:
+    - /api/v1/match/all
+
+  - name: match-service-matches-nearby
+    service: match-service-matches-nearby
+    paths:
+    - /api/v1/match/nearby/(?<distance>[^/]+)
+
+  - name: match-service-search-by-id
+    service: match-service-search-by-id
+    paths:
+    - /api/v1/match/(?<id>[^/]+)
+
+consumers:
+- username: swagger
+  keyauth_credentials:
+  - key: abcd
+
+plugins:
+- name: key-auth
+  config:
+    key_names: ["api_key"]
+- name: cors
+  config:
+    origins:
+      - "http://localhost:8888" # Adjust as needed for security
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS # Ensure OPTIONS is included
+    headers:
+      - Content-Type
+      - Authorization
+      - api_key
+      - X-Requested-With
+    exposed_headers:
+      - X-Total-Count
+    credentials: true
+    preflight_continue: false # Ensure this is false unless you have a specific need for it to be true
+    max_age: 3600

@@ -17,6 +17,7 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 
+@CrossOrigin("*")
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/match", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -54,16 +55,17 @@ public class MatchingProfileController {
         return ResponseEntity.ok(profiles);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MatchedUser> getUserMatchProfile(@PathVariable String id) {
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<MatchedUser> getUserMatchProfile(@PathVariable("id") String id) {
         MatchedUser profile = matchedUserService.getById(id);
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/nearby")
-    public ResponseEntity<List<MatchedUser>> findNearbyUserMatchProfiles(@RequestParam double distance, @AuthenticationPrincipal JwtAuthenticationToken principal) {
+    @GetMapping(value="/nearby/{distance}")
+    public ResponseEntity<List<MatchedUser>> findNearbyUserMatchProfiles(@PathVariable("distance") double distance,Principal principal) {
+        JwtAuthenticationToken jwtAuthToken = (JwtAuthenticationToken) principal;
         // Assuming distance is provided in kilometers for simplicity; adjust accordingly if needed
-        String userId = principal.getToken().getClaimAsString("sub");
+        String userId = jwtAuthToken.getToken().getClaimAsString("sub");
         List<MatchedUser> nearbyProfiles = matchedUserService.findMatchedUsersNearby(userId, distance);
         return ResponseEntity.ok(nearbyProfiles);
     }
