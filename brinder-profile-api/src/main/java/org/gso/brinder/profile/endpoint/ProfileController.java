@@ -101,7 +101,6 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        System.out.println(email.toString());
         Page<ProfileModel> profilePage = profileService.searchByMail(email.toString(), PageRequest.of(0, 1));
         
         // Check if there's at least one profile found

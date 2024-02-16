@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProfileService {
 
-    private final MatchRepository profileRepository;
-    private final CustomMatchRepository customProfileRepository;
+    private final ProfileRepository profileRepository;
+    private final CustomProfileRepository customProfileRepository;
 
     public ProfileModel createProfile(ProfileModel userModel) {
         return profileRepository.save(userModel);
