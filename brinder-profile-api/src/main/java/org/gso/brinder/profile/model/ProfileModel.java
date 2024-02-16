@@ -15,9 +15,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
-@Document
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = "profiles")
 public class ProfileModel {
 
     @Id
