@@ -1,9 +1,9 @@
 format_version: "1.1"
 apis:
   - name: brinder-match
-    uris: /brinder
+    uris: /match
     upstream_url: http://localhost:3000
     plugins:
       - name: key-auth
         config:
-          key_names: [eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkZjMwZmEzOS1kN2U1LTQxNzUtOTc2Yi03MzQxMDhlZmU2NTUifQ.eyJleHAiOjE3MTA3MTgxODUsImlhdCI6MTcwODEyNjE4NSwianRpIjoiMDMzYjk5NTktNDg2ZS00NDJmLTk4NjgtZGY5NGFjZGRiNWJkIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy90aW5kZWVyIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy90aW5kZWVyIiwidHlwIjoiSW5pdGlhbEFjY2Vzc1Rva2VuIn0.ECyxz6QFZNbJ_lkwwOPXdXgNThAF2NIDTfb-uQ4O940]
+          key_names: [eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJkZjMwZmEzOS1kN2U1LTQxNzUtOTc2Yi03MzQxMDhlZmU2NTUifQ.eyJleHAiOjE3MDgxMjYwODIsImlhdCI6MTcwODEyNjA1MiwianRpIjoiMDRiMDczYjAtOTkzNS00ZTA1LTk2ZGItMWI5NDkyYjRiOTYwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy90aW5kZWVyIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy90aW5kZWVyIiwidHlwIjoiSW5pdGlhbEFjY2Vzc1Rva2VuIn0.x_3xyjywC73x5qDya8_jeRPW11lRrswfCXKFgEJ3zz0]
