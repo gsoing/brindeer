@@ -16,13 +16,13 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { name, password } = req.body;
+        const { name, coordinates } = req.body;
 
-        if (!name || !password) {
-            return res.status(400).json({ message: "Please provide a name and a password." });
+        if (!name || !coordinates) {
+            return res.status(400).json({ message: "Please provide a name and a coordinates." });
         }
 
-        const newUser = new User(name, password);
+        const newUser = new User(name, coordinates);
         await setUser(newUser);
 
         res.status(201).json({ message: "User created.", user: newUser });
@@ -31,5 +31,6 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: "An error occurred while creating the user." });
     }
 });
+
 
 module.exports = router;

@@ -1,7 +1,7 @@
 class User {
-    constructor(username, password) {
+    constructor(username, coordinates) {
         this.username = username;
-        this.password = password;
+        this.coordinates = coordinates;
     }
 }
 
