@@ -1,11 +1,11 @@
 const express = require("express");
-const {getUsers} = require("../controllers/users/read");
 const {getProfiles} = require("../controllers/profil/read");
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
 
+        //@todo replace by data from keycloak
         let userName = "Enzo"
         let users = await getProfiles(userName)
 
