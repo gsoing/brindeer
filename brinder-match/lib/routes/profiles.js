@@ -1,13 +1,20 @@
 const express = require("express");
 const {getUsers} = require("../controllers/users/read");
+const {getProfiles} = require("../controllers/profil/read");
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
 
-        let users
+        let userName = "Enzo"
+        let users = await getProfiles(userName)
 
-        res.status(200).json(users);
+        if ( users.length > 0 ) {
+            res.status(200).json(users);
+        } else {
+            res.status(200).json({ message:"There is no profiles next to you..."} );
+        }
+
     } catch (error) {
         console.error('Error matching users:', error);
         res.status(500).json({ message: "An error occurred while matching users." });

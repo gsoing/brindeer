@@ -1,31 +1,44 @@
 const { connectToDatabase, closeDatabaseConnection } = require('../../database/mongo');
-const {getUserById} = require("../users/read");
+const {getUserById, getUsers} = require("../users/read");
+const geolib = require("geolib")
 
-async function getProfiles() {
+/**
+ * Get profiles that are within 100 meters of a user
+ */
+async function getProfiles(userName) {
 
     try {
-        const db = await connectToDatabase();
-        const collection = db.collection('utilisateurs');
-        let userName
+        let userWhoSearch = await getUserById(userName)
+        let users = await getUsers()
+        let usersNear = []
 
-        await getUserById(userName)
+        if (!userWhoSearch) {
+            throw new Error('User not found');
+            return [];
+        }
 
-        return await collection.find({
-            username: userName,
-            location: {
-                $near: {
-                    $geometry: {
-                        type: "Point",
-                        coordinates: [parseFloat(longitude), parseFloat(latitude)]
-                    },
-                    $maxDistance: 100
-                }
+        users.map( user => {
+
+            const distance = geolib.getDistance(
+                { latitude: userWhoSearch.coordinates.latitude, longitude: userWhoSearch.coordinates.longitude },
+                { latitude: user.coordinates.latitude, longitude: user.coordinates.longitude }
+            );
+
+            if ( distance  < 100 ) {
+                usersNear.push(user)
             }
-        });
+
+        })
+
+        console.log("usersNear", usersNear)
+        return usersNear
+
     } catch (error) {
         console.error('Error getting profiles:', error);
         throw error;
-    } finally {
-        closeDatabaseConnection()
     }
 }
+
+module.exports = {
+    getProfiles,
+};
