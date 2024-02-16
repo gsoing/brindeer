@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/brindeer.iml" filepath="$PROJECT_DIR$/.idea/brindeer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/brinder-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/brinder-common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/brinder-match-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/brinder-match-api.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/brinder-profile-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/brinder-profile-api.main.iml" />
+    </modules>
+  </component>
+</project>

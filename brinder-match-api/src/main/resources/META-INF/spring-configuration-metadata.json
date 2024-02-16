@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.data.environment.MONGO_INITDB_ROOT_USERNAME",
+      "type": "java.lang.String",
+      "description": "Description for spring.data.environment.MONGO_INITDB_ROOT_USERNAME."
+    }
+  ] }
