@@ -85,26 +85,32 @@ public class ProfileController {
     }
 
     @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(
-            @AuthenticationPrincipal Jwt principal,
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
             @PageableDefault(size = 20) Pageable pageable) {
-
-        Object email = principal.getClaims().get("email");
-        if (email == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-
-        Page<ProfileModel> results = profileService.searchByMail(email.toString(), pageable);
+        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
-
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pageResults);
     }
 
     @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
-        return ResponseEntity.ok(principal);
+    public ResponseEntity getCurrentUserProfile(@AuthenticationPrincipal Jwt principal) {
+        Object email = principal.getClaims().get("email");
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        System.out.println(email.toString());
+        Page<ProfileModel> profilePage = profileService.searchByMail(email.toString(), PageRequest.of(0, 1));
+        
+        // Check if there's at least one profile found
+        if(profilePage.hasContent()) {
+            return ResponseEntity.ok(profilePage.getContent().get(0).toDto());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        
     }
 
     /**
