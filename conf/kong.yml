@@ -1,0 +1,20 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  - name: profile
+    url: http://localhost:9080/api/v1/profiles/current
+    routes:
+      - paths:
+          - /api/v1/profiles/current
+    plugins:
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+          hide_credentials: true
+
+consumers:
+  - username: sara
+    key-auths:
+      - key: DDf6tyqpQa5711Z262iT3Uz6R4EaCS51
