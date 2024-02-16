@@ -4,15 +4,17 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
+  - url: http://localhost:8000/api/v1
+    description: Environnement kong api_key
   - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+    description: Microservice Profile - Environnement de test Docker
+  - url: http://localhost:9081/api/v1
+    description: Microservice Match - Environnement de test Docker
 components:
   securitySchemes:
     oAuthSample:    # <---- arbitrary name
       type: oauth2
-      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
+      description: This API uses OAuth 2
       flows:
         authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
           authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
@@ -20,10 +22,67 @@ components:
           scopes:
             profile: access profile
             email: access email
-security: 
-  - oAuthSample: 
-    - profile
-    - email
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+  schemas:
+    ProfileDto:
+      type: object
+      required:
+        - userId
+        - mail
+        - age
+      properties:
+        id:
+          type: string
+          description: Id du profil
+        userId:
+          type: string
+          description: Id de l'utilisateur
+        mail:
+          type: string
+          format: email
+          description: Adresse mail
+        age:
+          type: integer
+          format: int32
+          description: Âge
+        firstName:
+          type: string
+          description: Prénom
+        lastName:
+          type: string
+          description: Nom
+        created:
+          type: string
+          format: date-time
+          description: Date et heure de création du profil
+        modified:
+          type: string
+          format: date-time
+          description: Date et heure de la dernière modification du profil
+    Location:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Idde l'utilisateur
+        longitude:
+          type: number
+          format: float
+          description: Longitude
+        latitude:
+          type: number
+          format: float
+          description: Latitude
+security:
+  - oAuthSample:
+      - profile
+      - email
+  - apiKeyAuth:
+      - abcd
+
 paths:
   /profiles/current:
     get:
@@ -33,9 +92,67 @@ paths:
           description: A JSON array of user names
           content:
             application/json:
-              schema: 
+              schema:
                 type: object
                 properties:
                   name:
                     type: string
-                    
+  /update_localisation:
+    post:
+      summary: Met à jour la localisation de l'utilisateur
+      description: Met à jour la localisation
+      operationId: updateLocation
+      security:
+        - apiKeyAuth: []
+        - oAuthSample: [email]
+      parameters:
+        - in: query
+          name: longitude
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Longitude
+          example: 0
+        - in: query
+          name: latitude
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Latitude
+          example: 0
+      responses:
+        '200':
+          description: Localisation mise à jour avec succès.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '401':
+          description: Non autorisé.
+        '404':
+          description: Non trouvé.
+        '400':
+          description: Requête invalide.
+  /get_matches:
+    get:
+      summary: Trouve des matches dans un rayon de 100m.
+      description:
+      operationId: findMatchesNearby
+      security:
+        - apiKeyAuth: []
+        - oAuthSample: [email]
+      responses:
+        '200':
+          description: Matches à proximité.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+        '401':
+          description: Non autorisé.
+        '404':
+          description: Non trouvé.
