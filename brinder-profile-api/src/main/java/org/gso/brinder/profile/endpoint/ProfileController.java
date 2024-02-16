@@ -22,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,10 +38,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Slf4j
 @RestController
-@RequestMapping(
-        value = ProfileController.PATH,
-        produces = MediaType.APPLICATION_JSON_VALUE
-)
+@RequestMapping(value = ProfileController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ProfileController {
 
@@ -57,8 +56,8 @@ public class ProfileController {
                         ServletUriComponentsBuilder.fromCurrentContextPath()
                                 .path(createdProdile.getId())
                                 .build()
-                                .toUri()
-                ).body(createdProdile);
+                                .toUri())
+                .body(createdProdile);
     }
 
     @GetMapping("/{id}")
@@ -68,15 +67,15 @@ public class ProfileController {
 
     @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
+            @RequestBody @NonNull ProfileDto profileDto) {
         profileDto.setId(profileId);
         return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
     }
 
     @GetMapping
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
-        Pageable checkedPageable  = checkPageSize(pageable);
+            @PageableDefault(size = 20) Pageable pageable) {
+        Pageable checkedPageable = checkPageSize(pageable);
         Criteria criteria = convertQuery(query);
         Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
@@ -86,10 +85,18 @@ public class ProfileController {
     }
 
     @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(
+            @AuthenticationPrincipal Jwt principal,
+            @PageableDefault(size = 20) Pageable pageable) {
+
+        Object email = principal.getClaims().get("email");
+        if (email == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        Page<ProfileModel> results = profileService.searchByMail(email.toString(), pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pageResults);
@@ -101,7 +108,7 @@ public class ProfileController {
     }
 
     /**
-     * Convertit une requête RSQL en un objet Criteria compréhensible par la base
+     * Convertit une "requête RSQL en un objet Criteria compréhensible par la base
      *
      * @param stringQuery
      * @return
