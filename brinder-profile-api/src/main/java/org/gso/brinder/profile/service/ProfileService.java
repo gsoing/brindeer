@@ -1,6 +1,5 @@
 package org.gso.brinder.profile.service;
 
-import lombok.RequiredArgsConstructor;
 import org.gso.brinder.common.exception.NotFoundException;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.repository.CustomProfileRepository;
@@ -10,12 +9,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
 
-    private final ProfileRepository profileRepository;
-    private final CustomProfileRepository customProfileRepository;
+    private final MatchRepository profileRepository;
+    private final CustomMatchRepository customProfileRepository;
 
     public ProfileModel createProfile(ProfileModel userModel) {
         return profileRepository.save(userModel);
