@@ -29,8 +29,6 @@ services:
 - name: match-service-matches-nearby
   url: http://brinder-match-api:8080/api/v1/match/nearby/(?<distance>[^/]+)
 
-- name: match-service-search-by-id
-  url: http://brinder-match-api:8080/api/v1/match
 
 routes:
   - name: profiles-route-get-current
@@ -78,10 +76,6 @@ routes:
     paths:
     - /api/v1/match/nearby/(?<distance>[^/]+)
 
-  - name: match-service-search-by-id
-    service: match-service-search-by-id
-    paths:
-    - /api/v1/match/(?<id>[^/]+)
 
 consumers:
 - username: swagger

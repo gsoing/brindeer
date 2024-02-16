@@ -55,9 +55,9 @@ public class MatchingProfileController {
         return ResponseEntity.ok(profiles);
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<MatchedUser> getUserMatchProfile(@PathVariable("id") String id) {
-        MatchedUser profile = matchedUserService.getById(id);
+    @GetMapping(value = "/{idd}")
+    public ResponseEntity<MatchedUser> getUserMatchProfile(@PathVariable("idd") String idd) {
+        MatchedUser profile = matchedUserService.getById(idd);
         return ResponseEntity.ok(profile);
     }
 

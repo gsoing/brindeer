@@ -61,7 +61,7 @@ components:
         lastName:
           type: string
         geoCoordinates:
-          $ref: '#/components/schemas/GeoCoordinates'      
+          $ref: '#/components/schemas/GeoCoordinates'
     ProfileDto:
       type: object
       required:
@@ -101,7 +101,7 @@ security:
       - profile
       - email
   - apiKeyAuth:
-      - abcd  
+      - abcd
 paths:
   /profiles/current:
     get:
@@ -113,6 +113,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MatchedUser'
+  /match/nearby/{distance}:
+    get:
+      summary: Returns nearby user match profiles based on distance
+      parameters:
+        - name: distance
+          in: path
+          required: true
+          schema:
+            type: number
+            description: Distance in kilometers
+      responses:
+        '200':
+          description: List of nearby user match profiles successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchedUser'
   /match/createorupdate:
     post:
       summary: Creates or updates a matched user profile with geolocation
@@ -143,11 +162,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MatchedUser'
-  /match/{id}:
+  /match/{idd}:
     get:
       summary: Returns the specified user match profile by ID
       parameters:
-        - name: id
+        - name: idd
           in: path
           required: true
           schema:
@@ -161,25 +180,6 @@ paths:
                 $ref: '#/components/schemas/MatchedUser'
         '404':
           description: User match profile not found
-  /match/nearby/{distance}:
-    get:
-      summary: Returns nearby user match profiles based on distance
-      parameters:
-        - name: distance
-          in: path
-          required: true
-          schema:
-            type: number
-            description: Distance in kilometers
-      responses:
-        '200':
-          description: List of nearby user match profiles successfully returned
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/MatchedUser'
   /profiles:
     post:
       summary: Crée un nouveau profil

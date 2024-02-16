@@ -80,7 +80,7 @@ services:
       - 8445:8445
       - 8003:8003
       - 8004:8004
-    image: kong
+    image: kong:3.6
     networks:
       - kong-net
 

@@ -17,9 +17,6 @@ public interface MatchingRepository extends MongoRepository<MatchedUser, String>
     @Query("{'geoCoordinates.location': {$near: {$geometry: {type: 'Point', coordinates: [?0, ?1]}, $maxDistance: ?2}}}")
     List<MatchedUser> findByLocationNear(double longitude, double latitude, double distance);
 
-    // Optional: If you need pagination support for nearby searches
-    // Example method signature with pagination support
-    List<MatchedUser> findByGeoCoordinates_LocationNear(org.springframework.data.geo.Point location, Distance distance, Pageable pageable);
 }
 
 
