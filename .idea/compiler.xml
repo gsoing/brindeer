@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.24/13a394eed5c4f9efb2a6d956e2086f1d81e857d9/lombok-1.18.24.jar" />
+        </processorPath>
+        <module name="brinder-common.main" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="brinder-match-api" target="18" />
+      <module name="brinder-match_main" target="17" />
+      <module name="brinder-match_test" target="17" />
+      <module name="org.gso.brinder.brinder-profile-api" target="18" />
+      <module name="org.gso.brinder.brinder-profile-api.main" target="18" />
+      <module name="org.gso.brinder.brinder-profile-api.test" target="18" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
