@@ -1,6 +1,7 @@
 package org.gso.brinder.match.endpoint;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
@@ -72,6 +73,30 @@ public class MatchController {
         return ResponseEntity
                 .ok()
                 .body(matchService.updateProfileLocation(profile).toDto());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProfileDto>> getNearestMatches(@AuthenticationPrincipal Jwt principal) {
+        Object email = principal.getClaims().get("email");
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        Optional<ProfileModel> optionalProfile = matchService.findByEmail(email.toString());
+        if (!optionalProfile.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        ProfileModel profile = optionalProfile.get();
+
+        List<ProfileModel> modelList = matchService.findProfilesAround100m(profile.getLocation());
+        List<ProfileDto> dtoList = new ArrayList();
+
+        for (ProfileModel pro : modelList) {
+            dtoList.add(pro.toDto());
+        }
+
+        return ResponseEntity.ok().body(dtoList);
     }
 
     /**

@@ -109,7 +109,6 @@ public class ProfileController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        
     }
 
     /**

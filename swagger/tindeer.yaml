@@ -5,7 +5,9 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
+    description: Environnement de test Docker (Profil)
+  - url: http://localhost:9081/api/v1
+    description: Environnement de test Docker (Match)
   - url: http://localhost:9090/api/v1
     description: Environnement de test local
 components:
@@ -46,6 +48,15 @@ components:
           format: date-time
       required:
         - userId
+    GeoJsonPoint:
+      type: object
+      properties:
+        type:
+          type: string
+        coordinates:
+          type: array
+          items:
+            type: integer
 security:
   - oAuthSample:
     - profile
@@ -146,3 +157,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProfileDto'
+  /match:
+    put:
+      summary: Update the current user location
+      operationId: updateLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoJsonPoint'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJsonPoint'
+    get:
+      summary: Get all profiles within 100m of the user
+      operationId: getNearestMatches
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileDto'
+    
+  
