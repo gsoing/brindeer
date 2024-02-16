@@ -1,11 +1,14 @@
-package org.gso.brinder.profile.endpoint;
+package org.gso.brinder.match.endpoint;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
 
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.gso.brinder.common.dto.PageDto;
-import org.gso.brinder.profile.dto.ProfileDto;
-import org.gso.brinder.profile.model.ProfileModel;
-import org.gso.brinder.profile.service.ProfileService;
+import org.gso.brinder.match.dto.ProfileDto;
+import org.gso.brinder.match.model.ProfileModel;
+import org.gso.brinder.match.service.MatchService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,77 +41,62 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping(value = ProfileController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = MatchController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class ProfileController {
+public class MatchController {
 
-    public static final String PATH = "/api/v1/profiles";
+    public static final String PATH = "/api/v1/match";
     public static int MAX_PAGE_SIZE = 200;
 
-    private final ProfileService profileService;
+    private final MatchService matchService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
-        return ResponseEntity
-                .created(
-                        ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
-                                .build()
-                                .toUri())
-                .body(createdProdile);
-    }
+    @PutMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateLocation(@RequestBody GeoJsonPoint location,
+            @AuthenticationPrincipal Jwt principal) {
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
-        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
-    }
-
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-            @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
-    }
-
-    @GetMapping
-    public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
-            @PageableDefault(size = 20) Pageable pageable) {
-        Pageable checkedPageable = checkPageSize(pageable);
-        Criteria criteria = convertQuery(query);
-        Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
-        PageDto<ProfileDto> pageResults = toPageDto(results);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResults);
-    }
-
-    @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-            @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
-        PageDto<ProfileDto> pageResults = toPageDto(results);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResults);
-    }
-
-    @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(@AuthenticationPrincipal Jwt principal) {
         Object email = principal.getClaims().get("email");
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        Page<ProfileModel> profilePage = profileService.searchByMail(email.toString(), PageRequest.of(0, 1));
-        
-        // Check if there's at least one profile found
-        if(profilePage.hasContent()) {
-            return ResponseEntity.ok(profilePage.getContent().get(0).toDto());
-        } else {
+        Optional<ProfileModel> optionalProfile = matchService.findByEmail(email.toString());
+        if (!optionalProfile.isPresent()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+
+        ProfileModel profile = optionalProfile.get();
+        profile.setLocation(location);
+
+        System.out.println(profile);
+
+        return ResponseEntity
+                .ok()
+                .body(matchService.updateProfileLocation(profile).toDto());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProfileDto>> getNearestMatches(@AuthenticationPrincipal Jwt principal) {
+        Object email = principal.getClaims().get("email");
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        Optional<ProfileModel> optionalProfile = matchService.findByEmail(email.toString());
+        if (!optionalProfile.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        ProfileModel profile = optionalProfile.get();
+
+        List<ProfileModel> modelList = matchService.findProfilesAround100m(profile.getLocation());
+        List<ProfileDto> dtoList = new ArrayList();
+
+        for (ProfileModel pro : modelList) {
+            dtoList.add(pro.toDto());
+        }
+
+        return ResponseEntity.ok().body(dtoList);
     }
 
     /**

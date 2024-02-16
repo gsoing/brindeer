@@ -1,8 +1,8 @@
-package org.gso.brinder.profile.model;
+package org.gso.brinder.match.model;
 
 import java.time.LocalDateTime;
 
-import org.gso.brinder.profile.dto.ProfileDto;
+import org.gso.brinder.match.dto.ProfileDto;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
