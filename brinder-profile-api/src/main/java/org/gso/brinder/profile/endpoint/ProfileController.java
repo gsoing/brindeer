@@ -10,6 +10,7 @@ import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.gso.brinder.common.dto.PageDto;
+import org.gso.brinder.profile.dto.CoreProfileData;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
@@ -50,30 +51,40 @@ public class ProfileController {
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto, Principal principal) {
+        CoreProfileData coreProfileData = getDataFromToken(principal);
+        ProfileDto createdProfile = profileService.createProfile(profileDto.toModel(coreProfileData.getUserId(),
+                                                                                    coreProfileData.getFirstName(),
+                                                                                    coreProfileData.getLastName(),
+                                                                                    coreProfileData.getMail())).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
+                                .path(coreProfileData.getUserId())
                                 .build()
                                 .toUri()
-                ).body(createdProdile);
+                ).body(createdProfile);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
-        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileDto> getProfile(Principal principal) {
+        JwtAuthenticationToken jwtAuthToken = (JwtAuthenticationToken) principal;
+        String userId = jwtAuthToken.getToken().getClaimAsString("sub");
+        return ResponseEntity.ok(profileService.getProfile(userId).toDto());
     }
 
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
+    @PutMapping(path = "/update", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateProfile(@RequestBody @NonNull ProfileDto profileDto,
+                                                    Principal principal) {
+      CoreProfileData coreProfileData = getDataFromToken(principal);
+
+      return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel(coreProfileData.getUserId(),
+                                                                               coreProfileData.getFirstName(),
+                                                                               coreProfileData.getLastName(),
+                                                                               coreProfileData.getMail())).toDto());
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
                                                              @PageableDefault(size = 20) Pageable pageable) {
         Pageable checkedPageable  = checkPageSize(pageable);
@@ -85,9 +96,9 @@ public class ProfileController {
                 .body(pageResults);
     }
 
-    @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
+    @GetMapping(value="/{mail}")
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@PathVariable("mail") String mail,
+                                                            @PageableDefault(size = 20) Pageable pageable) {
         Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
@@ -149,5 +160,14 @@ public class ProfileController {
                         .queryParam("size", results.nextOrLastPageable().getPageSize())
                         .build().toUri());
         return pageResults;
+    }
+
+    public CoreProfileData getDataFromToken(Principal principal) {
+        JwtAuthenticationToken jwtAuthToken = (JwtAuthenticationToken) principal;
+        return new CoreProfileData(jwtAuthToken.getToken().getClaimAsString("sub"),
+        jwtAuthToken.getToken().getClaimAsString("email"),
+        jwtAuthToken.getToken().getClaimAsString("given_name"),
+        jwtAuthToken.getToken().getClaimAsString("family_name"));
+
     }
 }

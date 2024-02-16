@@ -38,13 +38,16 @@ public class ProfileDto {
     @JsonFormat(pattern = "YYYY-MM-DD HH:mm:ss")
     private LocalDateTime modified;
 
-    public ProfileModel toModel() {
+    public ProfileModel toModel(String userId, String firstName, String lastName, String email) {
         return ProfileModel.builder()
-                .id(this.id)
-                .userId(this.userId)
+                .id(userId)
+                .userId(userId)
                 .age(this.age)
-                .firstName(this.firstName)
-                .lastName(this.lastName)
+                .firstName(firstName)
+                .lastName(lastName)
+                .created(LocalDateTime.now())
+                .modified(LocalDateTime.now())
+                .mail(email)
                 .build();
     }
 }

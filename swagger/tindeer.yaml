@@ -4,38 +4,257 @@ info:
   description: Notre super API pour notre application mobile de rencontre de Rennes
   version: 1.0.0
 servers:
+  - url: http://localhost:8000/api/v1
+    description: kong
   - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker
+    description: environnement de test profile-api
   - url: http://localhost:9090/api/v1
-    description: Environnement de test local
+    description: Environnement de test match-api
 components:
   securitySchemes:
-    oAuthSample:    # <---- arbitrary name
+    oAuthSample:
       type: oauth2
       description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
       flows:
-        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
+        authorizationCode:
           authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
           tokenUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/token
           scopes:
             profile: access profile
             email: access email
-security: 
-  - oAuthSample: 
-    - profile
-    - email
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+  schemas:
+    GeoJsonPoint:
+      type: object
+      required:
+        - type
+        - coordinates
+      properties:
+        type:
+          type: string
+          enum: [Point]
+          description: The type of GeoJSON object, which is a Point in this case.
+        coordinates:
+          type: array
+          description: An array of two numbers (longitude, latitude) representing the position of the point.
+          items:
+            type: number
+            format: double
+          minItems: 2
+          maxItems: 2
+          example: [-73.856077, 40.848447]
+    GeoCoordinates:
+      type: object
+      properties:
+        location:
+          $ref: '#/components/schemas/GeoJsonPoint'
+    MatchedUser:
+      type: object
+      properties:
+        idMatchedUser:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        geoCoordinates:
+          $ref: '#/components/schemas/GeoCoordinates'
+    ProfileDto:
+      type: object
+      required:
+        - userId
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the Profile
+        userId:
+          type: string
+          description: User identifier, must not be empty
+        mail:
+          type: string
+          format: email
+          description: Email address of the user
+        age:
+          type: integer
+          format: int32
+          minimum: 13
+          description: Age of the user, must be at least 13
+        firstName:
+          type: string
+          description: First name of the user
+        lastName:
+          type: string
+          description: Last name of the user
+        created:
+          type: string
+          format: date-time
+          description: Date and time when the profile was created, in YYYY-MM-DD HH:mm:ss format
+        modified:
+          type: string
+          format: date-time
+          description: Date and time when the profile was last modified, in YYYY-MM-DD HH:mm:ss format
+security:
+  - oAuthSample:
+      - profile
+      - email
+  - apiKeyAuth:
+      - abcd
 paths:
   /profiles/current:
     get:
-      summary: Retourne le profile courant de l'utilisateur
+      summary: Retourne le profil courant de l'utilisateur
       responses:
-        '200':    # status code
-          description: A JSON array of user names
+        '200':
+          description: Profil d'utilisateur courant retourné avec succès
           content:
             application/json:
-              schema: 
-                type: object
-                properties:
-                  name:
-                    type: string
-                    
+              schema:
+                $ref: '#/components/schemas/MatchedUser'
+  /match/nearby/{distance}:
+    get:
+      summary: Returns nearby user match profiles based on distance
+      parameters:
+        - name: distance
+          in: path
+          required: true
+          schema:
+            type: number
+            description: Distance in kilometers
+      responses:
+        '200':
+          description: List of nearby user match profiles successfully returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchedUser'
+  /match/createorupdate:
+    post:
+      summary: Creates or updates a matched user profile with geolocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeoCoordinates'
+      responses:
+        '201':
+          description: Matched user profile successfully created or updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchedUser'
+        '400':
+          description: Invalid data provided
+  /match/all:
+    get:
+      summary: Returns all user match profiles with pagination
+      responses:
+        '200':
+          description: List of user match profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchedUser'
+  /match/{idd}:
+    get:
+      summary: Returns the specified user match profile by ID
+      parameters:
+        - name: idd
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User match profile found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchedUser'
+        '404':
+          description: User match profile not found
+  /profiles:
+    post:
+      summary: Crée un nouveau profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '201':
+          description: Profil créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/profile:
+    get:
+      summary: Retourne le profil de l'utilisateur courant
+      responses:
+        '200':
+          description: Profil d'utilisateur courant retourné avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/update:
+    put:
+      summary: Met à jour le profil d'un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '200':
+          description: Profil d'utilisateur mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+  /profiles/search:
+    get:
+      summary: Recherche des profils basés sur une requête
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des profils correspondants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileDto'
+  /profiles/{mail}:
+    get:
+      summary: Recherche des profils par mail
+      parameters:
+        - name: mail
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des profils correspondants par mail
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileDto'
