@@ -9,6 +9,7 @@ import com.github.rutledgepaulv.qbuilders.visitors.MongoVisitor;
 import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
@@ -51,6 +52,14 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
+
+    @GetMapping("/current")
+    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
+        // Utiliser l'ID de l'utilisateur connecté pour récupérer son profil
+        String userId = principal.getName();
+        return ResponseEntity.ok(profileService.getProfileByUserId(userId));
+    }
+
     // Utiliser JwtAuthenticationToken pour obtenir les informations de l'utilisateur connecté
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal, @RequestBody ProfileDto profileDto) {
@@ -67,29 +76,10 @@ public class ProfileController {
                 ).body(createdProfile);
     }
 
-    @GetMapping
-    public ResponseEntity<PageDto<ProfileDto>> searchProfile(JwtAuthenticationToken principal, @RequestParam(required = false) String query,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
-        // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
-        String userId = principal.getName();
-        Pageable checkedPageable = checkPageSize(pageable);
-        Criteria criteria = convertQuery(query);
-        Page<ProfileModel> results = profileService.searchProfilesByUserId(userId, criteria, checkedPageable);
-        PageDto<ProfileDto> pageResults = toPageDto(results);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResults);
-    }
-
     // Supprimer le paramètre d'entrée profileId car il n'est plus nécessaire
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(JwtAuthenticationToken principal) {
-        // Utiliser l'ID de l'utilisateur connecté pour récupérer son profil
-        String userId = principal.getName();
-        Optional<ProfileModel> profileOpt = profileService.getProfile(userId);
-        if (!profileOpt.isPresent()) {
-            throw new NotFoundException();
-        }
+    @GetMapping("/{id}") //renvoie l'utilisateur associé à un ID donné
+    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") String id) {
+        ProfileModel profileOpt = profileService.getProfile(id);
         return ResponseEntity.ok(profileOpt.get().toDto());
     }
 
@@ -104,22 +94,14 @@ public class ProfileController {
 
 
     @GetMapping(params = "mail")
-    public ResponseEntity<SpringDataJaxb.PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail,
-                                                                           @PageableDefault(size = 20) Pageable pageable) {
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail, @PageableDefault(size = 20) Pageable pageable) {
         // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
         String userId = principal.getName();
-        Page<ProfileModel> results = profileService.searchByMail(userId, mail, pageable);
+        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pageResults);
-    }
-
-    @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
-        // Utiliser l'ID de l'utilisateur connecté pour récupérer son profil
-        String userId = principal.getName();
-        return ResponseEntity.ok(profileService.getProfileByUserId(userId).toDto());
     }
 
 

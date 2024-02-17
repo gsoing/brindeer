@@ -44,4 +44,5 @@ public class ProfileService {
     public Optional<ProfileModel> getProfileByUserId(String userId) {
         return profileRepository.findById(userId);
     }
+
 }
