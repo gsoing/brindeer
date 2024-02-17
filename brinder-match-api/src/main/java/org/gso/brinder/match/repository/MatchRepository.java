@@ -1,5 +1,6 @@
 package org.gso.brinder.match.repository;
 
+import org.gso.brinder.match.dto.MatchDto;
 import org.gso.brinder.match.model.MatchModel;
 import org.gso.brinder.match.model.ProfileModel;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -17,5 +18,7 @@ public interface MatchRepository extends MongoRepository<MatchModel, String> {
 
     @Query("{ location: { $near: { $geometry: { type: 'Point', coordinates: [ ?0, ?1 ] }, $maxDistance: 100 } } }")
     List<ProfileModel> findNearbyUsers(double latitude, double longitude);
+    @Query("{ 'userId': ?0 }")
+    MatchDto findProfileLocationById(String userId);
 }
 

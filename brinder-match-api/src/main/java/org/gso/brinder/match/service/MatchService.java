@@ -1,6 +1,7 @@
 package org.gso.brinder.match.service;
 
 import lombok.RequiredArgsConstructor;
+import org.gso.brinder.match.dto.MatchDto;
 import org.gso.brinder.match.model.MatchModel;
 import org.gso.brinder.match.model.ProfileModel;
 //TODO import org.gso.brinder.profile.model.ProfileModel;
@@ -21,8 +22,10 @@ public class MatchService {
         matchRepository.updateUserLocation(userId, latitude, longitude);
     }
 
-    public List<ProfileModel> findNearbyUsers(double lat, double loong) {
-        // Utilisez une méthode de MatchRepository pour rechercher les utilisateurs à proximité
+    public List<ProfileModel> findNearbyUsers(String userId) {
+        MatchDto user = matchRepository.findProfileLocationById(userId);
+        double lat;
+        double loong;
         return matchRepository.findNearbyUsers(lat, loong);
     }
 }

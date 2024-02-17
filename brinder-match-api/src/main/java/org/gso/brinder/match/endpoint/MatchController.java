@@ -31,10 +31,9 @@ public class MatchController {
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
     @GetMapping()
-    public List<ProfileModel> searchNearbyUsers(@RequestBody MatchDto request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (String) authentication.getPrincipal();
-        return matchService.findNearbyUsers(request.getLatitude(), request.getLongitude());
+    public List<ProfileModel> searchNearbyUsers(JwtAuthenticationToken principal) {
+        String userId = principal.getName();
+        return matchService.findNearbyUsers(userId);
     }
 
     @PutMapping()
