@@ -48,7 +48,7 @@ app.use(async (req, res, next) => {
         }
     } catch (error) {
         console.error('Error with token:', error);
-        return res.status(500).json({ message:"An error occurred."});
+        return res.status(401).json({ message:"You need to be log"});
     }
 
     next();
