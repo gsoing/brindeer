@@ -1,120 +1,50 @@
 openapi: 3.0.0
 info:
-  title: Tindeer API
-  description: Notre super API pour notre application mobile de rencontre de Rennes
+  title: Profile Controller API
+  description: API for managing user profiles
   version: 1.0.0
 servers:
-  - url: http://localhost:9080/api/v1
-    description: Environnement de test Docker (Profil)
-  - url: http://localhost:9081/api/v1
-    description: Environnement de test Docker (Match)
-  - url: http://localhost:9090/api/v1
-    description: Environnement de test local
-components:
-  securitySchemes:
-    oAuthSample:    # <---- arbitrary name
-      type: oauth2
-      description: This API uses OAuth 2 with the implicit grant flow. [More info](https://api.example.com/docs/auth)
-      flows:
-        authorizationCode:   # <---- OAuth flow(authorizationCode, implicit, password or clientCredentials)
-          authorizationUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/auth
-          tokenUrl: http://keycloak:8080/realms/tindeer/protocol/openid-connect/token
-          scopes:
-            profile: access profile
-            email: access email
-  schemas:
-    ProfileDto:
-      type: object
-      properties:
-        id:
-          type: string
-        userId:
-          type: string
-        mail:
-          type: string
-          format: email
-        age:
-          type: integer
-          minimum: 13
-        firstName:
-          type: string
-        lastName:
-          type: string
-        created:
-          type: string
-          format: date-time
-        modified:
-          type: string
-          format: date-time
-      required:
-        - userId
-    GeoJsonPoint:
-      type: object
-      properties:
-        type:
-          type: string
-        coordinates:
-          type: array
-          items:
-            type: integer
-security:
-  - oAuthSample:
-    - profile
-    - email
+  - url: http://localhost:8080/api/v1
 paths:
-  /profiles/current:
-    get:
-      summary: Get current user data
-      responses:
-        '200':    # status code
-          description: A JSON array of user names
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    type: string
   /profiles:
-    get:
-      summary: Search profiles by mail
-      operationId: searchByMail
-      parameters:
-        - name: mail
-          in: query
-          description: Email address
-          schema:
-            type: string
-        - name: page
-          in: query
-          description: Page number
-          schema:
-            type: integer
-        - name: size
-          in: query
-          description: Page size
-          schema:
-            type: integer
-            default: 20
-            maximum: 200
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProfileDto'
     post:
       summary: Create a new profile
       operationId: createProfile
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ProfileDto'
       responses:
         '201':
-          description: Created
+          description: Profile created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+    get:
+      summary: Get the profile of the current user
+      operationId: getProfile
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+    put:
+      summary: Update the profile of the current user
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileDto'
+      responses:
+        '200':
+          description: Profile updated successfully
           content:
             application/json:
               schema:
@@ -122,7 +52,7 @@ paths:
   /profiles/{id}:
     get:
       summary: Get a profile by ID
-      operationId: getProfile
+      operationId: getProfileById
       parameters:
         - name: id
           in: path
@@ -131,14 +61,14 @@ paths:
             type: string
       responses:
         '200':
-          description: OK
+          description: Profile retrieved successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProfileDto'
     put:
       summary: Update a profile by ID
-      operationId: updateProfile
+      operationId: updateProfileById
       parameters:
         - name: id
           in: path
@@ -146,42 +76,64 @@ paths:
           schema:
             type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ProfileDto'
       responses:
         '200':
-          description: OK
+          description: Profile updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProfileDto'
-  /match:
-    put:
-      summary: Update the current user location
-      operationId: updateLocation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GeoJsonPoint'
-      responses:
-        '200':
-          description: Updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GeoJsonPoint'
+  /profiles/search:
     get:
-      summary: Get all profiles within 100m of the user
-      operationId: getNearestMatches
+      summary: Search profiles
+      operationId: searchProfiles
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
       responses:
         '200':
-          description: ok
+          description: Profiles retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProfileDto'
+                $ref: '#/components/schemas/PageDtoProfileDto'
+components:
+  schemas:
+    ProfileDto:
+      type: object
+      properties:
+        userId:
+          type: string
+        # Add other properties here
+    PageDtoProfileDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileDto'
+        totalElements:
+          type: integer
+        pageSize:
+          type: integer
+        next:
+          type: string
+        first:
+          type: string
+        last:
+          type: string
