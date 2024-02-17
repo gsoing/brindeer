@@ -1,9 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/brinder
-      database: brinder
       auto-index-creation: true
+      database: brinder
 logging:
   level:
     org:
