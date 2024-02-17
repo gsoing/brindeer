@@ -60,7 +60,17 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.getProfileByUserId(userId));
     }
 
-    // Utiliser JwtAuthenticationToken pour obtenir les informations de l'utilisateur connecté
+    @GetMapping(params = "mail")
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail, @PageableDefault(size = 20) Pageable pageable) {
+        // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
+        String userId = principal.getName();
+        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
+        PageDto<ProfileDto> pageResults = toPageDto(results);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(pageResults);
+    }
+
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal, @RequestBody ProfileDto profileDto) {
         // Utiliser l'ID de l'utilisateur connecté pour créer le profil
@@ -83,26 +93,15 @@ public class ProfileController {
         return ResponseEntity.ok(profileOpt.get().toDto());
     }
 
-    // Supprimer le paramètre d'entrée profileId car il n'est plus nécessaire
     @PutMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ProfileDto> updateProfile(JwtAuthenticationToken principal, @RequestBody @NonNull ProfileDto profileDto) {
-        // Utiliser l'ID de l'utilisateur connecté pour mettre à jour son profil
         String userId = principal.getName();
         profileDto.setUserId(userId);
         return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
     }
 
 
-    @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail, @PageableDefault(size = 20) Pageable pageable) {
-        // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
-        String userId = principal.getName();
-        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
-        PageDto<ProfileDto> pageResults = toPageDto(results);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResults);
-    }
+    //---------------------------------Tools-------------------------------------------
 
 
     /**
