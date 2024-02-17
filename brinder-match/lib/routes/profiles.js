@@ -5,9 +5,8 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
 
-        //@todo replace by data from keycloak
-        let userName = "Enzo"
-        let users = await getProfiles(userName)
+        console.log( "/profiles - userName" , req.currentUser )
+        let users = await getProfiles(req.currentUser)
 
         if ( users.length > 0 ) {
             res.status(200).json(users);

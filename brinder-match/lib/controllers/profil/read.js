@@ -1,5 +1,5 @@
 const { connectToDatabase, closeDatabaseConnection } = require('../../database/mongo');
-const {getUserById, getUsers} = require("../users/read");
+const {getUserById, getUsers, getUser} = require("../users/read");
 const geolib = require("geolib")
 
 /**
@@ -8,14 +8,18 @@ const geolib = require("geolib")
 async function getProfiles(userName) {
 
     try {
-        let userWhoSearch = await getUserById(userName)
+
+        console.log( userName )
+        let userWhoSearch = await getUser(userName)
+
+        console.log( 'userWhoSearch', userWhoSearch )
+
+        if ( userWhoSearch === null ) {
+            throw new Error("User not found in database" )
+        }
+
         let users = await getUsers()
         let usersNear = []
-
-        if (!userWhoSearch) {
-            throw new Error('User not found');
-            return [];
-        }
 
         users.map( user => {
 

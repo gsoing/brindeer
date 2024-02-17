@@ -1,4 +1,0 @@
-module.exports = {
-    mongoUrl: 'mongodb://localhost:27017',
-    dbName: 'nom_de_votre_base_de_données'
-};

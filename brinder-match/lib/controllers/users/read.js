@@ -14,14 +14,14 @@ async function getUsers() {
     }
 }
 
-async function getUserById(userName) {
+async function getUser(userName) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection('utilisateurs');
-        return await collection.findOne({ username: userName });
+        return await collection.findOne({ "username": userName });
     } catch (error) {
         console.error("Error fetching user by ID:", error);
-        throw error;
+        return false;
     } finally {
         closeDatabaseConnection();
     }
@@ -29,5 +29,5 @@ async function getUserById(userName) {
 
 module.exports = {
     getUsers,
-    getUserById
+    getUser
 };
