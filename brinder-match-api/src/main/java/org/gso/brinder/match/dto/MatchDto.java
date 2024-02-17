@@ -16,7 +16,7 @@ public class MatchDto {
 
     private double latitude;
     private double longitude;
-    private ProfileModel profile;
+
 
     public double getLatitude() {
         return latitude;
@@ -34,11 +34,4 @@ public class MatchDto {
         this.longitude = longitude;
     }
 
-    public ProfileModel getProfile() {
-        return profile;
-    }
-
-    public void setProfile(ProfileModel profile) {
-        this.profile = profile;
-    }
 }

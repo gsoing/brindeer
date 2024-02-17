@@ -10,10 +10,12 @@ import org.gso.brinder.match.service.MatchService;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("*")
 @Slf4j
 @RestController
 @RequestMapping(
@@ -36,9 +38,8 @@ public class MatchController {
     }
 
     @PutMapping()
-    public void updateLocation(@RequestBody MatchDto request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (String) authentication.getPrincipal();
+    public void updateLocation(JwtAuthenticationToken principal, @RequestBody MatchDto request) {
+        String userId = principal.getName();
         matchService.updateUserLocation(userId, request.getLatitude(), request.getLongitude());
     }
 
