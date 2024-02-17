@@ -1,0 +1,18 @@
+_format_version: "1.1"
+
+_transform: true
+
+services:
+  - name: profile_current
+    url: http://localhost:9080/api/v1/profiles/current
+    routes:
+      - name: profile_current
+        paths:
+          - /api/v1/profiles/current
+
+plugins:
+  - name: key-auth
+    service: example-service
+    config:
+      key_names:
+        - apikey
