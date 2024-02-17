@@ -1,0 +1,27 @@
+_format_version: "1.1"
+
+services:
+    - name: api-match
+      url: http://api-match:3000/api/v1
+      routes:
+          - name: api-match-route
+            paths:
+                - /matches
+
+    - name: profile-api
+      url: http://profile-api:9080/api/v1
+      routes:
+          - name: profile-api-route
+            paths:
+                - /profiles
+
+
+plugins:
+    - name: oauth2
+      config:
+          enable_authorization_code: true
+          enable_client_credentials: true
+          mandatory_scope: true
+          provision_key: ${KONG_PROVISION_KEY}
+          token_expiration: 7200
+
