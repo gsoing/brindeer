@@ -1,19 +1,11 @@
 package org.gso.brinder.match.dto;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gso.brinder.match.model.MatchModel;
+import org.gso.brinder.match.model.ProfileModel;
 
 @Data
 @Builder
@@ -22,4 +14,31 @@ import org.gso.brinder.match.model.MatchModel;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class MatchDto {
 
+    private double latitude;
+    private double longitude;
+    private ProfileModel profile;
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public ProfileModel getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ProfileModel profile) {
+        this.profile = profile;
+    }
 }

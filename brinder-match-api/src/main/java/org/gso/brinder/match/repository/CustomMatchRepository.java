@@ -1,4 +1,4 @@
-package org.gso.brinder.profile.repository;
+package org.gso.brinder.match.repository;
 
 import java.util.List;
 

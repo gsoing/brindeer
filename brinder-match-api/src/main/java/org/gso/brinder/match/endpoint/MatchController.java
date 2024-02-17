@@ -1,38 +1,18 @@
 package org.gso.brinder.match.endpoint;
 
-import java.security.Principal;
-import java.util.List;
-
-import com.github.rutledgepaulv.qbuilders.builders.GeneralQueryBuilder;
-import com.github.rutledgepaulv.qbuilders.conditions.Condition;
-import com.github.rutledgepaulv.qbuilders.visitors.MongoVisitor;
 import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.match.dto.MatchDto;
-import org.gso.brinder.match.model.MatchModel;
+import org.gso.brinder.match.model.ProfileModel;
+//TODO import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.match.service.MatchService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -42,5 +22,24 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 )
 @RequiredArgsConstructor
 public class MatchController {
+
+    public static final String PATH = "/api/v1/match";
+    public static int MAX_PAGE_SIZE = 200;
+    private final MatchService matchService;
+    private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
+
+    @GetMapping()
+    public List<ProfileModel> searchNearbyUsers(@RequestBody MatchDto request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+        return matchService.findNearbyUsers(request.getLatitude(), request.getLongitude());
+    }
+
+    @PutMapping()
+    public void updateLocation(@RequestBody MatchDto request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+        matchService.updateUserLocation(userId, request.getLatitude(), request.getLongitude());
+    }
 
 }

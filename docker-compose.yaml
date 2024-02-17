@@ -36,6 +36,24 @@ services:
     depends_on:
       - mongo
 
+  match:
+    container_name: match
+    build: ./brinder-match-api
+    ports:
+      - 9081:8080
+    volumes:
+      - ./logs:/var/log/spring
+    environment:
+      spring_profiles_active: security,docker
+      LOGGING_LEVEL_ROOT: DEBUG
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+    depends_on:
+      - mongo
+
   swagger:
     image: swaggerapi/swagger-ui
     environment:

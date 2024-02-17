@@ -1,16 +1,28 @@
 package org.gso.brinder.match.service;
 
 import lombok.RequiredArgsConstructor;
-import org.gso.brinder.common.exception.NotFoundException;
 import org.gso.brinder.match.model.MatchModel;
-import org.gso.brinder.match.repository.CustomMatchRepository;
+import org.gso.brinder.match.model.ProfileModel;
+//TODO import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.match.repository.MatchRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MatchService {
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    public void updateUserLocation(String userId, double latitude, double longitude) {
+        matchRepository.updateUserLocation(userId, latitude, longitude);
+    }
+
+    public List<ProfileModel> findNearbyUsers(double lat, double loong) {
+        // Utilisez une méthode de MatchRepository pour rechercher les utilisateurs à proximité
+        return matchRepository.findNearbyUsers(lat, loong);
+    }
 }
