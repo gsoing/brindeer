@@ -39,7 +39,7 @@ paths:
                   name:
                     type: string
 
-  /profiles/create:
+  /profiles:
     post:
       summary: Crée le profile d'un utilisateur
       responses:
@@ -47,6 +47,11 @@ paths:
           description: Profile créé
         '400':
           description: Données invalides fournies
+    get:
+      summary: Récupère la liste des profils
+      responses:
+        '200':
+          description: Liste des profils
 
   /profiles/{id}:
     get:

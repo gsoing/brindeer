@@ -49,9 +49,24 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+    @PostMapping //(consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal) {
+        // Extraction des informations du JWT
+        String userId = principal.getToken().getClaimAsString("sub");
+        String email = principal.getToken().getClaimAsString("email");
+        String firstName = principal.getToken().getClaimAsString("given_name");
+        String lastName = principal.getToken().getClaimAsString("family_name");
+
+        // Construction du ProfileDto avec les informations extraites
+        ProfileDto profile = ProfileDto.builder()
+                .userId(userId)
+                .mail(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                // Ajoutez ici d'autres champs en fonction de ce que vous avez dans le JWT
+                .build();
+
+        ProfileDto createdProdile = profileService.createProfile(profile.toModel()).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -95,9 +110,25 @@ public class ProfileController {
                 .body(pageResults);
     }
 
+
     @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
-        return ResponseEntity.ok(principal);
+    public ResponseEntity<ProfileDto> getCurrentUserProfile(JwtAuthenticationToken principal) {
+        // Extraction des informations du JWT
+        String userId = principal.getToken().getClaimAsString("sub");
+        String email = principal.getToken().getClaimAsString("email");
+        String firstName = principal.getToken().getClaimAsString("given_name");
+        String lastName = principal.getToken().getClaimAsString("family_name");
+
+        // Construction du ProfileDto avec les informations extraites
+        ProfileDto profile = ProfileDto.builder()
+                .userId(userId)
+                .mail(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                // Ajoutez ici d'autres champs en fonction de ce que vous avez dans le JWT
+                .build();
+
+        return ResponseEntity.ok(profile);
     }
 
     /**
