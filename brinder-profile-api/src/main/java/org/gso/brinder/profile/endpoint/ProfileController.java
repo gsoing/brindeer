@@ -9,13 +9,16 @@ import com.github.rutledgepaulv.qbuilders.visitors.MongoVisitor;
 import com.github.rutledgepaulv.rqe.pipes.QueryConversionPipeline;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.gso.brinder.common.dto.PageDto;
 import org.gso.brinder.profile.dto.ProfileDto;
 import org.gso.brinder.profile.model.ProfileModel;
 import org.gso.brinder.profile.service.ProfileService;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -49,45 +52,18 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
-        return ResponseEntity
-                .created(
-                        ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
-                                .build()
-                                .toUri()
-                ).body(createdProdile);
-    }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
-        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
-    }
-
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
-    }
-
-    @GetMapping
-    public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
-        Pageable checkedPageable  = checkPageSize(pageable);
-        Criteria criteria = convertQuery(query);
-        Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
-        PageDto<ProfileDto> pageResults = toPageDto(results);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResults);
+    @GetMapping("/current")
+    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
+        // Utiliser l'ID de l'utilisateur connecté pour récupérer son profil
+        String userId = principal.getName();
+        return ResponseEntity.ok(profileService.getProfileByUserId(userId));
     }
 
     @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail, @PageableDefault(size = 20) Pageable pageable) {
+        // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
+        String userId = principal.getName();
         Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
@@ -95,10 +71,38 @@ public class ProfileController {
                 .body(pageResults);
     }
 
-    @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
-        return ResponseEntity.ok(principal);
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal, @RequestBody ProfileDto profileDto) {
+        // Utiliser l'ID de l'utilisateur connecté pour créer le profil
+        String userId = principal.getName();
+        profileDto.setUserId(userId);
+        ProfileDto createdProfile = profileService.createProfile(profileDto.toModel()).toDto();
+        return ResponseEntity
+                .created(
+                        ServletUriComponentsBuilder.fromCurrentContextPath()
+                                .path(createdProfile.getId())
+                                .build()
+                                .toUri()
+                ).body(createdProfile);
     }
+
+    // Supprimer le paramètre d'entrée profileId car il n'est plus nécessaire
+    @GetMapping("/{id}") //renvoie l'utilisateur associé à un ID donné
+    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") String id) {
+        ProfileModel profileOpt = profileService.getProfile(id);
+        return ResponseEntity.ok(profileOpt.get().toDto());
+    }
+
+    @PutMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ProfileDto> updateProfile(JwtAuthenticationToken principal, @RequestBody @NonNull ProfileDto profileDto) {
+        String userId = principal.getName();
+        profileDto.setUserId(userId);
+        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
+    }
+
+
+    //---------------------------------Tools-------------------------------------------
+
 
     /**
      * Convertit une requête RSQL en un objet Criteria compréhensible par la base

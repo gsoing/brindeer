@@ -45,4 +45,8 @@ public class ProfileModel {
                 .modified(this.modified)
                 .build();
     }
+
+    public ProfileModel get() {
+        return this;
+    }
 }
