@@ -1,13 +1,13 @@
-package org.gso.brinder.profile;
+package org.gso.brinder.match;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BrinderProfileApplication {
+public class BrinderMatchApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BrinderProfileApplication.class, args);
+		SpringApplication.run(BrinderMatchApplication.class, args);
 	}
 
 }

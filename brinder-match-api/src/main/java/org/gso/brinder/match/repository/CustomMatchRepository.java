@@ -4,8 +4,8 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.gso.brinder.profile.model.ProfileModel;
-import org.gso.brinder.profile.service.ProfileService;
+import org.gso.brinder.match.model.MatchModel;
+import org.gso.brinder.match.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,18 +19,6 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @RequiredArgsConstructor
 @Repository
-public class CustomProfileRepository {
+public class CustomMatchRepository {
 
-    @Autowired
-    MongoTemplate mongoTemplate;
-
-    public Page<ProfileModel> searchProfiles(Criteria criteria, Pageable pageable) {
-        Query query = new Query().addCriteria(criteria).with(pageable);
-        List<ProfileModel> results = mongoTemplate.find(query, ProfileModel.class);
-        Page<ProfileModel> profilesPage = PageableExecutionUtils.getPage(
-                results,
-                pageable,
-                () -> mongoTemplate.count(query, ProfileModel.class));
-        return profilesPage;
-    }
 }

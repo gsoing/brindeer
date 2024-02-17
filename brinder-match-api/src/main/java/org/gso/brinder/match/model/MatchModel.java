@@ -17,19 +17,4 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 public class MatchModel {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private Long userId;
-
-    private double latitude;
-
-    private double longitude;
-
-    private LocalDateTime createdAt;
-
-    // Autres champs spécifiques à votre modèle de match
-
 }
