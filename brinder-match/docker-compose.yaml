@@ -1,0 +1,10 @@
+version: '3'
+services:
+  api-match:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - /lib:/lib
+    environment:
+      NODE_ENV: production

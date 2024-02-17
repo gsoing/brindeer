@@ -1,0 +1,21 @@
+meta {
+  name: setUser
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/v1/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name" : "Yannis",
+    "coordinates": {
+      "longitude" : 48.856483,
+      "latitude" : 2.3522219
+    }
+  }
+}
