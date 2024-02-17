@@ -1,6 +1,7 @@
 package org.gso.brinder.profile.endpoint;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.github.rutledgepaulv.qbuilders.builders.GeneralQueryBuilder;
@@ -49,30 +50,72 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
-        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
+
+    /** *** *** *** POST /profiles *** *** *** */
+    @PostMapping
+    public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal) throws Exception {
+        String userId = principal.getToken().getClaimAsString("sub");
+        String email = principal.getToken().getClaimAsString("email");
+        String firstName = principal.getToken().getClaimAsString("given_name");
+        String lastName = principal.getToken().getClaimAsString("family_name");
+
+        ProfileDto profile = ProfileDto.builder()
+                .userId(userId)
+                .mail(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                // age : for the creation of the profile we don't have the age
+                // to add it, we need to update the profile
+                .created(LocalDateTime.now())
+                .modified(LocalDateTime.now())
+                .build();
+
+        ProfileDto createdProdile = profileService.createProfile(profile.toModel()).toDto();
+
+        if (createdProdile == null) {
+            throw new Exception("Failed to create profile");
+        }
+
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProdile.getId())
-                                .build()
-                                .toUri()
+                                .path(createdProdile.getId()).build().toUri()
                 ).body(createdProdile);
     }
 
+    /** *** *** *** GET /profiles/{id} *** *** *** */
+    // here we can't use the jwt because the user can access to the profile of another user
     @GetMapping("/{id}")
     public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
         return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
     }
 
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
-                                                    @RequestBody @NonNull ProfileDto profileDto) {
-        profileDto.setId(profileId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
+    /** *** *** *** PUT /profiles *** *** *** */
+    // here the user can only update his profile
+    @PutMapping
+    public ResponseEntity<ProfileDto> updateProfile(@RequestBody @NonNull ProfileDto profileDto, JwtAuthenticationToken principal) {
+        String userId = principal.getToken().getClaimAsString("sub");
+        ProfileDto existingProfile = profileService.getProfile(userId).toDto();
+        if (existingProfile == null) {
+            return ResponseEntity.notFound().build();
+        }
+        profileDto.setId(existingProfile.getId());
+        profileDto.setUserId(userId);
+
+        String email = principal.getToken().getClaimAsString("email");
+        String firstName = principal.getToken().getClaimAsString("given_name");
+        String lastName = principal.getToken().getClaimAsString("family_name");
+
+        profileDto.setMail(email);
+        profileDto.setFirstName(firstName);
+        profileDto.setLastName(lastName);
+
+        ProfileDto updatedProfile = profileService.updateProfile(profileDto.toModel()).toDto();
+        return ResponseEntity.ok(updatedProfile);
     }
 
+    /** *** *** *** GET /profiles *** *** *** */
+    // here we can't use the jwt because we are looking for all the profiles
     @GetMapping
     public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
                                                              @PageableDefault(size = 20) Pageable pageable) {
@@ -85,19 +128,22 @@ public class ProfileController {
                 .body(pageResults);
     }
 
-    @GetMapping(params = "mail")
-    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
-                                                             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
-        PageDto<ProfileDto> pageResults = toPageDto(results);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(pageResults);
-    }
-
+    /** *** *** *** GET /profiles/current *** *** *** */
     @GetMapping("/current")
-    public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
-        return ResponseEntity.ok(principal);
+    public ResponseEntity<ProfileDto> getCurrentUserProfile(JwtAuthenticationToken principal) {
+        String userId = principal.getToken().getClaimAsString("sub");
+        String email = principal.getToken().getClaimAsString("email");
+        String firstName = principal.getToken().getClaimAsString("given_name");
+        String lastName = principal.getToken().getClaimAsString("family_name");
+
+        ProfileDto profile = ProfileDto.builder()
+                .userId(userId)
+                .mail(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                .build();
+
+        return ResponseEntity.ok(profile);
     }
 
     /**
