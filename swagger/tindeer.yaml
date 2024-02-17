@@ -10,9 +10,7 @@ servers:
   - url: http://kong:8000/api/v1
     description: kong
   - url: http://api-match:3000/api/v1
-    description: api-match - Docker
-  - url: http://localhost:3000/api/v1
-    description: api-match - Local
+    description: api-match
   - url: http://localhost:9080/api/v1
     description: profile api - Docker
   - url: http://localhost:9090/api/v1
