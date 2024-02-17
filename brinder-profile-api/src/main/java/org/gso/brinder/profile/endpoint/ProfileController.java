@@ -49,64 +49,46 @@ public class ProfileController {
     private final ProfileService profileService;
     private QueryConversionPipeline pipeline = QueryConversionPipeline.defaultPipeline();
 
-    // Utiliser JwtAuthenticationToken pour obtenir les informations de l'utilisateur connecté
     @PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> createProfile(JwtAuthenticationToken principal, @RequestBody ProfileDto profileDto) {
-        // Utiliser l'ID de l'utilisateur connecté pour créer le profil
-        String userId = principal.getName();
-        profileDto.setUserId(userId);
-        ProfileDto createdProfile = profileService.createProfile(profileDto.toModel()).toDto();
+    public ResponseEntity<ProfileDto> createProfile(@RequestBody ProfileDto profileDto) {
+        ProfileDto createdProdile = profileService.createProfile(profileDto.toModel()).toDto();
         return ResponseEntity
                 .created(
                         ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path(createdProfile.getId())
+                                .path(createdProdile.getId())
                                 .build()
                                 .toUri()
-                ).body(createdProfile);
+                ).body(createdProdile);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProfileDto> getProfile(@PathVariable("id") @NonNull String profileId) {
+        return ResponseEntity.ok(profileService.getProfile(profileId).toDto());
+    }
+
+    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<ProfileDto> updateProfile(@PathVariable @NonNull String profileId,
+                                                    @RequestBody @NonNull ProfileDto profileDto) {
+        profileDto.setId(profileId);
+        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
     }
 
     @GetMapping
-    public ResponseEntity<PageDto<ProfileDto>> searchProfile(JwtAuthenticationToken principal, @RequestParam(required = false) String query,
-                                                             @PageableDefault(size =  20) Pageable pageable) {
-        // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
-        String userId = principal.getName();
+    public ResponseEntity<PageDto<ProfileDto>> searchProfile(@RequestParam(required = false) String query,
+                                                             @PageableDefault(size = 20) Pageable pageable) {
         Pageable checkedPageable  = checkPageSize(pageable);
         Criteria criteria = convertQuery(query);
-        Page<ProfileModel> results = profileService.searchProfilesByUserId(userId, criteria, checkedPageable);
+        Page<ProfileModel> results = profileService.searchProfiles(criteria, checkedPageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(pageResults);
     }
 
-    // Supprimer le paramètre d'entrée profileId car il n'est plus nécessaire
-    @GetMapping("/{id}")
-    public ResponseEntity<ProfileDto> getProfile(JwtAuthenticationToken principal) {
-        // Utiliser l'ID de l'utilisateur connecté pour récupérer son profil
-        String userId = principal.getName();
-        Optional<ProfileModel> profileOpt = profileService.getProfile(userId);
-        if (!profileOpt.isPresent()) {
-            throw new NotFoundException();
-        }
-        return ResponseEntity.ok(profileOpt.get().toDto());
-    }
-
-    // Supprimer le paramètre d'entrée profileId car il n'est plus nécessaire
-    @PutMapping(path = "/{id}", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<ProfileDto> updateProfile(JwtAuthenticationToken principal, @RequestBody @NonNull ProfileDto profileDto) {
-        // Utiliser l'ID de l'utilisateur connecté pour mettre à jour son profil
-        String userId = principal.getName();
-        profileDto.setUserId(userId);
-        return ResponseEntity.ok(profileService.updateProfile(profileDto.toModel()).toDto());
-    }
-
-
-    @GetMapping(params = "/mail")
-    public ResponseEntity<SpringDataJaxb.PageDto<ProfileDto>> searchByMail(JwtAuthenticationToken principal, @RequestParam String mail,
-                                                                           @PageableDefault(size =  20) Pageable pageable) {
-        // Utiliser l'ID de l'utilisateur connecté pour filtrer les résultats
-        String userId = principal.getName();
-        Page<ProfileModel> results = profileService.searchByMail(userId, mail, pageable);
+    @GetMapping(params = "mail")
+    public ResponseEntity<PageDto<ProfileDto>> searchByMail(@RequestParam String mail,
+                                                             @PageableDefault(size = 20) Pageable pageable) {
+        Page<ProfileModel> results = profileService.searchByMail(mail, pageable);
         PageDto<ProfileDto> pageResults = toPageDto(results);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -115,11 +97,8 @@ public class ProfileController {
 
     @GetMapping("/current")
     public ResponseEntity getCurrentUserProfile(JwtAuthenticationToken principal) {
-        // Utiliser l'ID de l'utilisateur connecté pour récupérer son profil
-        String userId = principal.getName();
-        return ResponseEntity.ok(profileService.getProfileByUserId(userId).toDto());
+        return ResponseEntity.ok(principal);
     }
-
 
     /**
      * Convertit une requête RSQL en un objet Criteria compréhensible par la base
